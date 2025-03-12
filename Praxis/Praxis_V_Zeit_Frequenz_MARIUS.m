@@ -7,12 +7,12 @@
 
 restoredefaultpath
 
-% clear all variables from the workspace
+% Clear all variables from the workspace
 clear
-% clear the command window (the window at the bottom)
+% Clear the command window (the window at the bottom)
 clc
 
-% change path into the directory of eeglab
+% Change path into the directory of eeglab
 addpath('eeglab2021.1')
 eeglab;
 close;
@@ -21,28 +21,26 @@ close;
 
 pathToData='data/preprocessed_data';
 
-%load data of subject 002
+% Lade alle Daten für Subject 002
 
 load([pathToData  '/gip_sub-002.mat']);
 
 %% Fourier Transformation
 
-channel = 60;
-
-%Von Hand, etwas muehsam:
-
+% Von Hand, etwas muehsam:
+channel = 60; % Wir schauen uns das Ganze erstmal für eine Elektrode an
 fft_res=abs(fft(EEG.data(channel,1:1000))); 
-%wir wählen abs(fft) für die amplitude
-%FFT liefert auch phasen information - diese interessiert uns meist nicht
+% Wir wählen abs(fft) für die Amplitude
+% FFT liefert auch Phaseninformation - diese interessiert uns aber meist nicht
 
 figure;
 plot(fft_res)
-%Schwer zu lesen!
-%Ergebnis gespiegelt?
+% Schwer zu lesen!
+% Ergebnis gespiegelt? -> weil 
 
 fft_res=fft_res(1:500);
-
-% Mit vorkenntnissen aus dem Blockkurs koennen wir aber berechnen um welche 
+plot(fft_res)
+% Mit Vorkenntnissen aus dem Blockkurs koennen wir aber berechnen um welche 
 % Frequenzen es sich handelt:
 
 % wir haben 4-Sekunden-Zeitfenster 
