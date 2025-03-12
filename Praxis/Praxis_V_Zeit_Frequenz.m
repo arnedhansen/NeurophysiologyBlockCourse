@@ -7,99 +7,99 @@
 
 restoredefaultpath
 
-% clear all variables from the workspace
+% Clear all variables from the workspace
 clear
-% clear the command window (the window at the bottom)
+% Clear the command window (the window at the bottom)
 clc
 
-% change path into the directory of eeglab
+% Change path into the directory of eeglab
 addpath('eeglab2021.1')
 eeglab;
 close;
-
 
 %% DATA IMPORT
 
 pathToData='data/preprocessed_data';
 
-%load data of subject 002
+% Lade alle Daten für Subject 002
 
 load([pathToData  '/gip_sub-002.mat']);
 
 %% Fourier Transformation
 
-channel = 60;
-
-%Von Hand, etwas muehsam:
-
+% Von Hand, etwas muehsam:
+channel = 60; % Wir schauen uns das Ganze erstmal für eine Elektrode an
 fft_res=abs(fft(EEG.data(channel,1:1000))); 
-%wir wählen abs(fft) für die amplitude
-%FFT liefert auch phasen information - diese interessiert uns meist nicht
+% Wir wählen abs(fft) für die Amplitude
+% FFT liefert auch Phaseninformation - diese interessiert uns aber meist nicht
 
 figure;
 plot(fft_res)
-%Schwer zu lesen!
-%Ergebnis gespiegelt?
+% Schwer zu lesen!
+% Ergebnis gespiegelt? -> weil 
 
 fft_res=fft_res(1:500);
-
-% Mit vorkenntnissen aus dem Blockkurs koennen wir aber berechnen um welche 
+plot(fft_res)
+% Mit Vorkenntnissen aus dem Blockkurs koennen wir aber berechnen um welche 
 % Frequenzen es sich handelt:
 
-% wir haben 4-Sekunden-Zeitfenster 
-% Kleinste schaetzbare Frequenz & Frequenzauflösung = X Hz = 0.25
-% Groesste schaetzbare Frequenz = Y Hz = ?
+% Wir haben 4-Sekunden-Zeitfenster und eine Abtastrate von 250 Hz
+% Kleinste schaetzbare Frequenz = ??? Hz
+% Frequenzauflösung = ??? Hz
+% Groesste schaetzbare Frequenz = ??? Hz
 
-frequenzen =[0.25:0.25:125]; 
+frequenzen = XXX:XXX:XXX; %%%%% 0.25:0.25:125
 figure;
 plot(frequenzen,fft_res);
 
-
 %% EEGLab kann das auch, besser, und gleichzeitg für alle Kanäle!
 
-doc spectopo
+help spectopo
+% Sind unsere EEG-Daten im 2D-Format (nchans, time_points)?
+size(EEG.data)
 
-[spec,freq]=spectopo(EEG.data(channel,1:1000),0,EEG.srate);
-%Trick wurde angewand, Daten wurden in 4 1 sek segmente unteteilt, FFT über
-%diese 4 gemacht und ggemittelt - deswegen schöneres- glatteres resultat,
-%aber schlechtere frequenzauflösung
+[spec,freq] = spectopo(EEG.data(channel,1:1000),0,EEG.srate);
+% Trick wurde angewandt! 
+% Daten wurden in 4 x 1 sec Segmente unterteilt, FFT über
+% diese 4 gemacht und gemittelt - deswegen schöneres, glatteres Resultat,
+% aber schlechtere Frequenzauflösung
 
-%oder sogar gleichzeitig für alle Kanäle, über die gesamten Daten
+% FT gleichzeitig für alle Kanäle, über die gesamten Daten
 figure;
-[spec,freq]=spectopo(EEG.data,0,EEG.srate);
+[spec,freq] = spectopo(EEG.data,0,EEG.srate);
 
-%dimensionen von spec jetzt 70*126, freq bleibt unverändert, weil?
+% Dimensionen von spec jetzt 70*126, freq bleibt unverändert, weil?
+size(spec)
 
 figure;
 plot(freq,spec(60,:))
 
 % Projekt Idee:
 % Fourier Transformation fuer trials machen, in denen gesichter praesentiert
-% wurden, und fuer trials in denen "scrambeled" gesichter praesentiert 
+% wurden, und fuer trials in denen "scrambelled" gesichter praesentiert 
 % wurden (aufpassen auf unterschiedliche anzahl von trials)
 %-> Ergebnisse vergleichen (ausserdem, sinnvollere Elektrode, oder Cluster
 % von Elektroden wählen)
-
 
 %% Zeit-Frequenz-Analyse
 
 %% Von Hand, für die ersten 20 sekunden, verwende 1 sek segmente
 
-winSize=250;
+winSize = 250;
 
-spec_tf=[];
-freq_tf=[];
+spec_tf = [];
+freq_tf = [];
 
-for i=1:20
+for i = 1:20
     start = (i-1)*winSize+1;
     stop = i*winSize;
-    [spec_tf(:,i),freq_tf(i,:)]=spectopo(EEG.data(channel,start:stop),0,EEG.srate,'plot','off','winsize',winSize);
+    [spec_tf(:,i),freq_tf(i,:)] = spectopo(EEG.data(channel,start:stop),0,EEG.srate,'plot','off','winsize',winSize);
 end
 
-%Ergebnis ansehen (diesmal nur von 2-30Hz):
+% Ergebnis ansehen (diesmal nur von 2-30Hz):
 
-freq1=find(freq_tf(1,:)==2)
-freq2=find(freq_tf(1,:)==30)
+freq1 = find(freq_tf(1,:) == 2)
+freq2 = find(freq_tf(1,:) == 30)
 
 figure;
 imagesc(spec_tf(freq1:freq2,:));
@@ -110,7 +110,7 @@ colorbar;
 plotFreq=freq_tf(1,freq1:freq2);
 zeit=[1:1:20];
 
-%TODO: x / y durch korrkte variable ersetzen (zeit / plotFreq)
+% TODO: x / y durch korrkte variable ersetzen (zeit / plotFreq)
 
 figure;
 imagesc(zeit,plotFreq,spec_tf(freq1:freq2,:));
