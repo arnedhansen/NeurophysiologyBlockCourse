@@ -153,7 +153,7 @@ set(gca,'ydir','reverse')
 %% auch hier mit vorprogammierten Funktionen aus EEGLab. 
 
 %% Neue Fragestellung, wie veraendert sich das Frequenzspektrum nach
-%% Praesentation eines stimulus?
+%% Praesentation eines Stimulus?
 
 % Zuerst: Daten segmentieren!
 
@@ -186,7 +186,7 @@ figure;
 
 %% Zum schluss: Hilbert transformation
 
-% Fuer dieses Beispiel nehmen wir die alpha Oszillation über die
+% Fuer dieses Beispiel nehmen wir die Alpha-Oszillation über die
 % ersten 10 sekunden
 
 EEG_short=pop_select( EEG,'time',[0, 10] );
@@ -205,14 +205,14 @@ plot(EEG_short_filt.times,EEG_short_filt.data(channel,:));
 %--------------
 % Alpha power extrahieren mit Hilbert Transformation
 
-alphapow=abs(hilbert(EEG_short_filt.data(channel,:)));
+alphapow = abs(hilbert(EEG_short_filt.data(channel,:)));
 %--------------
 
-%Ergebnis visualisieren:
+% Ergebnis visualisieren:
 
 figure;
 plot(EEG_short_filt.times,EEG_short_filt.data(channel,:));
-%TODO
+% TODO
 hold on;
 plot(EEG_short_filt.times,alphapow)
 
