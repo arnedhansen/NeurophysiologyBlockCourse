@@ -9,7 +9,7 @@ restoredefaultpath
 
 % Clear all variables from the workspace
 clear
-% Clear the command window (the window at the bottom)
+% Clear the command window
 clc
 
 % Change path into the directory of eeglab
@@ -17,12 +17,8 @@ addpath('eeglab2021.1')
 eeglab;
 close;
 
-%% DATA IMPORT
-
-pathToData='data/preprocessed_data';
-
-% Lade alle Daten für Subject 002
-
+%% Lade alle Daten für Subject 002
+pathToData = 'data/preprocessed_data';
 load([pathToData  '/gip_sub-002.mat']);
 
 %% Fourier Transformation
@@ -30,20 +26,20 @@ load([pathToData  '/gip_sub-002.mat']);
 % Von Hand, etwas muehsam:
 channel = 60; % Wir schauen uns das Ganze erstmal für eine Elektrode an
 fft_res = abs(fft(EEG.data(channel,1:1000))); 
+fft_res = fft_res(1:length(fft_res)/2);
 % Wir wählen abs(fft) für die Amplitude
 % FFT liefert auch Phaseninformation - diese interessiert uns aber meist nicht
 
 figure;
 plot(fft_res)
-% Schwer zu lesen!
-% Ergebnis gespiegelt? -> weil 
 
-fft_res=fft_res(1:500);
-plot(fft_res)
+% Schwierig zu erkennen...
+
+
 % Mit Vorkenntnissen aus dem Blockkurs koennen wir aber berechnen, um welche 
 % Frequenzen es sich handelt:
 
-% Wir haben 4-Sekunden-Zeitfenster und eine Abtastrate von 250 Hz
+% Wir haben 4-Sekunden-Segment und eine Abtastrate von 250 Hz
 % Kleinste schaetzbare Frequenz = ??? Hz
 % Frequenzauflösung = ??? Hz
 % Groesste schaetzbare Frequenz = ??? Hz
@@ -60,35 +56,35 @@ size(EEG.data)
 
 [spec,freq] = spectopo(EEG.data(channel,1:1000),0,EEG.srate);
 % Trick wurde angewandt! 
-% Daten wurden in 4 x 1 sec Segmente unterteilt, FFT über
-% diese 4 gemacht und gemittelt - deswegen schöneres, glatteres Resultat,
+% 
+% WELCH
+% 
+% 
+% Daten wurden in 4 Segmente von 1 Sekunde unterteilt, FFT über 
+% diese 4 gemacht und gemittelt - deswegen schöneres, glatteres Resultat, (wegen Mittelwert) 
 % aber schlechtere Frequenzauflösung
 
 % FT gleichzeitig für alle Kanäle, über die gesamten Daten
 figure;
-[spec,freq] = spectopo(EEG.data,0,EEG.srate);
+[spec,freq] = spectopo(EEG.data,0,EEG.srate); 
 
-% Dimensionen von spec jetzt 70*126, freq bleibt unverändert, weil?
+% Dimensionen von spec jetzt 70*126, freq bleibt unverändert, weil? %%%%%
+% 126 Frequency bins
+% Freuqenz 0 ist CHATGPT
 size(spec)
 
 figure;
 plot(freq,spec(60,:))
 
-% Projekt Idee:
-% Fourier Transformation fuer trials machen, in denen gesichter praesentiert
-% wurden, und fuer trials in denen "scrambelled" gesichter praesentiert 
-% wurden (aufpassen auf unterschiedliche anzahl von trials)
-%-> Ergebnisse vergleichen (ausserdem, sinnvollere Elektrode, oder Cluster
-% von Elektroden wählen)
-
 %% Zeit-Frequenz-Analyse
 
-%% Von Hand, für die ersten 20 sekunden, verwende 1 sek segmente
+% Von Hand STFT selber machen mit 1 sec segemtns über 20secs
 
-winSize = 250;
+% Für die ersten 20 Sekunden
+% Verwende Segmente von 1 Sekunde
 
-spec_tf = [];
-freq_tf = [];
+winSize = 250; % 250 Zeitpunkte, die 4 ms auseinander liegen = 1 Sekunde
+% Berechnung Frequenzauflösung: 1/T [s]
 
 for i = 1:20
     start = (i-1)*winSize+1;
@@ -97,57 +93,49 @@ for i = 1:20
 end
 
 % Ergebnis ansehen (diesmal nur von 2-30Hz):
-
-freq1 = find(freq_tf(1,:) == 2)
-freq2 = find(freq_tf(1,:) == 30)
-
-figure;
-imagesc(spec_tf(freq1:freq2,:));
-colorbar;
-
-% Plot geht auch besser: Mit korrekter x-y Achsen Beschriftung
-
-plotFreq=freq_tf(1,freq1:freq2);
-zeit=[1:1:20];
-
-% TODO: x / y durch korrkte variable ersetzen (zeit / plotFreq)
+freq1 = find(freq_tf(1,:) == 2) % Frequenz mit 2 Hz
+freq2 = find(freq_tf(1,:) == 30) % Frequenz mit 30 Hz
 
 figure;
-imagesc(zeit,plotFreq,spec_tf(freq1:freq2,:));
+imagesc(spec_tf(freq1:freq2,:), [-30 30]);
+colormap('turbo')
 colorbar;
 set(gca,'YDir','normal')
 
-%%  Vergleich: Wieder die ersten 20 sekunden, diesmal 2 sek segmente
+%%  Vergleich
+% Wieder die ersten 20 Sekunden
+% ABER: Segmente von 2 Sekunden
 
-%TODO: ersetze XX, YY und YZ durch korrekte werte
+winSizeB = 500; % 500 Zeitpunkte, die 4 ms auseinander liegen = 2 Sekunden
+% Berechnung Frequenzauflösung: 1/T [s]
 
-winSizeB=500;
-
-spec_tf2=[];
-freq_tf2=[];
-
-for i=1:10
+for i = 1:10
     start = (i-1)*winSizeB+1;
     stop = i*winSizeB;
-    [spec_tf2(:,i),freq_tf2(i,:)]=spectopo(EEG.data(channel,start:stop),0,250,'plot','off','winsize',winSizeB);
+    [spec_tf2(:,i),freq_tf2(i,:)] = spectopo(EEG.data(channel,start:stop),0,EEG.srate,'plot','off','winsize',winSizeB);
 end
 
-freq1B=find(freq_tf2(1,:)==2)
-freq2B=find(freq_tf2(1,:)==30)
+freq1B = find(freq_tf2(1,:) == 2)
+freq2B = find(freq_tf2(1,:) == 30)
 
-plotFreqB=freq_tf2(1,freq1B:freq2B);
-zeitB=[1:2:20];
+plotFreqB = freq_tf2(1,freq1B:freq2B); % Frequenzachse von 2 bis 30 Hz
+% ABER: Wie viele Frequenz-Bins?
+size(plotFreqB, 2)
+% 57 Frequenz-Bins, weil plotFreqB von 2 bis 30 Hz geht in Schritten von 0.5 Hz
+zeitB = 1:2:20; % Zeitachse von 1 bis 20 Sekunden (2 Sek-Schritte!)
 
-
-%TODO: x / y durch korrkte variable ersetzen (zeitB / plotFreqB)
+% Plotten (mit korrigierter x- und y-Achse)
 figure;
-imagesc(zeitB,plotFreqB,spec_tf2(freq1B:freq2B,:));
+imagesc(zeitB,plotFreqB,spec_tf2(freq1B:freq2B,:), [-30 30]);
 colorbar;
-set(gca,'ydir','reverse')
+colormap('turbo')
+colorbar;
+set(gca,'YDir','normal')
 
-%Frequenzaufloesung ist besser geworden, aber Zeitauflösung schlechter
-% Und: Fuer alle frequenzen die wir geschätzt haben ist die Aufloesung
-% genau die selbe
+% Frequenzaufloesung ist besser geworden!
+% ABER Zeitauflösung schlechter!
+% Und: Fuer alle Frequenzen, die wir geschätzt haben ist die Aufloesung
+% genau die selbe!
 
 %% Man kann TF analysen von Hand programmieren, einfacher geht es aber
 %% auch hier mit vorprogammierten Funktionen aus EEGLab. 
@@ -164,18 +152,22 @@ nCycles=0; % Anazhl an Zylen für wavelet analyse -> 0 heisst: keine Zyklen -> s
 doc pop_newtimef
 
 figure;
-[ersp,~,~,times,freqs]=pop_newtimef(EEGC_all,1,channel,[-400, 2600],nCycles, 'freqs',[3,30],'plotphasesign','off','plotitc','off');
-%Plot nicht schliessen
-%Wie ist zeitauflösung, wie ist frequenzauflösung?
+[ersp,~,~,times,freqs] = pop_newtimef(EEGC_all,1,channel,[-400, 2600],nCycles, 'freqs',[3 30],'plotphasesign','off','plotitc','off');
+% Plot nicht schliessen
+% Wie ist Zeitauflösung, wie ist Frequenzauflösung?
 
-% Vergleiche Ergebnis mit Wavelet Analyse 
+% Vergleiche Ergebnis mit Wavelet-Analyse 
 
-nCycles=3; %Wavelets mit 3 Zyklen
+nCycles = 5; % Wavelets mit 5 Zyklen
 figure;
-[erspWave,~,~,timesWave,freqsWave]=pop_newtimef(EEGC_all,1,channel,[-400, 2600],nCycles, 'freqs',[3,30],'plotphasesign','off','plotitc','off');
+[erspWave,~,~,timesWave,freqsWave]=pop_newtimef(EEGC_all,1,channel,[-400, 2600],nCycles, 'freqs',[3 30],'plotphasesign','off','plotitc','off');
 
 %man sieht: 
-%1. Zeit teilweise abgeschnitten (wavelets müssen ganz reinpassen - whiteboard) 
+% Zeit teilweise abgeschnitten (wavelets müssen ganz reinpassen - whiteboard/VISUALIESIERUNG) 
+%   Zeit insgesamt 3s
+%   5 zyklen
+%   0.33 (3Hz) langsamstse Wavelet
+%   erster Werte bei -400 + 750 = 350ms
 
 % oben (hohe frequenzen), power wechselt schnell, gute
 % Zeitauflösung, aber die langen "Streifen" zeigen dass man nicht wirklich
