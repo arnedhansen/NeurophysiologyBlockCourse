@@ -29,7 +29,7 @@ load([pathToData  '/gip_sub-002.mat']);
 
 % Von Hand, etwas muehsam:
 channel = 60; % Wir schauen uns das Ganze erstmal für eine Elektrode an
-fft_res=abs(fft(EEG.data(channel,1:1000))); 
+fft_res = abs(fft(EEG.data(channel,1:1000))); 
 % Wir wählen abs(fft) für die Amplitude
 % FFT liefert auch Phaseninformation - diese interessiert uns aber meist nicht
 
@@ -40,7 +40,7 @@ plot(fft_res)
 
 fft_res=fft_res(1:500);
 plot(fft_res)
-% Mit Vorkenntnissen aus dem Blockkurs koennen wir aber berechnen um welche 
+% Mit Vorkenntnissen aus dem Blockkurs koennen wir aber berechnen, um welche 
 % Frequenzen es sich handelt:
 
 % Wir haben 4-Sekunden-Zeitfenster und eine Abtastrate von 250 Hz
