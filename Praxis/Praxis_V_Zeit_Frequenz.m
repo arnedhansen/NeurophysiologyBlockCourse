@@ -4,17 +4,30 @@
 % Frequenz-Analysen und Zeit-Frequenz-Analysen
 
 %% SETUP
-
+% Dieser code bewirkt, dass Matlab immer in den richtigen Ordner springt
+editorFile = matlab.desktop.editor.getActiveFilename;
+cd(fileparts(editorFile))
 restoredefaultpath
 
-% Clear all variables from the workspace
+% Alle Variablen löschen, die noch im Workspace vorhanden sind
 clear
-% Clear the command window
+
+% Das "Command Window" leeren
 clc
 
-% Change path into the directory of eeglab
+%% Pfade vorbereiten
+
+% Pfad zu den Daten
+pathToData='data/preprocessed_data'; 
+
+% Pfad zu EEGlab
 addpath('eeglab2021.1')
-eeglab;
+% Danach wird MATLAB EEGLab öffnen können, jedoch noch nicht alle Funktionen
+% wie Filter etc verwenden können.
+
+% EEGlab öffnen und schliessen (damit werden alle wichtigen Funktionen für 
+% und zum Pfad hinzugefügt)
+eeglab
 close;
 
 %% Lade alle Daten für Subject 002
