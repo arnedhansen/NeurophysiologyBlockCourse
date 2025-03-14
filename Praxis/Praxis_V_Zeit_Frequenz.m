@@ -23,7 +23,7 @@ load([pathToData  '/gip_sub-002.mat']);
 
 %% Fourier Transformation
 
-% Von Hand, etwas muehsam:
+% Von Hand, etwas mühsam:
 channel = 60; % Wir schauen uns das Ganze erstmal für eine Elektrode an
 fft_res = abs(fft(EEG.data(channel,1:1000))); 
 fft_res = fft_res(1:length(fft_res)/2);
@@ -36,13 +36,13 @@ plot(fft_res)
 % Schwierig zu erkennen...
 
 
-% Mit Vorkenntnissen aus dem Blockkurs koennen wir aber berechnen, um welche 
+% Mit Vorkenntnissen aus dem Blockkurs können wir aber berechnen, um welche 
 % Frequenzen es sich handelt:
 
 % Wir haben 4-Sekunden-Segment und eine Abtastrate von 250 Hz
-% Kleinste schaetzbare Frequenz = ??? Hz
+% Kleinste schätzbare Frequenz = ??? Hz
 % Frequenzauflösung = ??? Hz
-% Groesste schaetzbare Frequenz = ??? Hz
+% Grösste schätzbare Frequenz = ??? Hz
 
 frequenzen = XXX:XXX:XXX; %%%%% 0.25:0.25:125
 figure;
@@ -132,16 +132,16 @@ colormap('turbo')
 colorbar;
 set(gca,'YDir','normal')
 
-% Frequenzaufloesung ist besser geworden!
+% Frequenzauflösung ist besser geworden!
 % ABER Zeitauflösung schlechter!
-% Und: Fuer alle Frequenzen, die wir geschätzt haben ist die Aufloesung
+% Und: Für alle Frequenzen, die wir geschätzt haben ist die Auflösung
 % genau die selbe!
 
 %% Man kann TF analysen von Hand programmieren, einfacher geht es aber
 %% auch hier mit vorprogammierten Funktionen aus EEGLab. 
 
-%% Neue Fragestellung, wie veraendert sich das Frequenzspektrum nach
-%% Praesentation eines Stimulus?
+%% Neue Fragestellung, wie verändert sich das Frequenzspektrum nach
+%% Präsentation eines Stimulus?
 
 % Zuerst: Daten segmentieren!
 
@@ -174,18 +174,18 @@ figure;
 % unterscheiden kann zwischen den hohen frequenzen (zb. 20/30)
 
 % unten (tiefe Frequenzen), power wechselt langsam (schlechte 
-% Zeitaufloesung) 
+% Zeitauflösung) 
 
 %% Zum schluss: Hilbert transformation
 
-% Fuer dieses Beispiel nehmen wir die Alpha-Oszillation über die
+% Für dieses Beispiel nehmen wir die Alpha-Oszillation über die
 % ersten 10 sekunden
 
 EEG_short=pop_select( EEG,'time',[0, 10] );
 
 %zum alpha band filtern (8-13 Hz)
 
-%TODO: Funktions-argumente ausfuellen)
+%TODO: Funktions-argumente ausfüllen)
 EEG_short_filt=pop_eegfiltnew(EEG_short,8,13);
 
 %plot: Daten vor und nach filtern 
