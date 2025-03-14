@@ -45,9 +45,7 @@ fft_res = fft_res(1:length(fft_res)/2);
 
 figure;
 plot(fft_res)
-
-% Schwierig zu erkennen...
-
+% Schwierig zu erkennen, welche Frequenzen hier am stärksten ausgeprägt sind
 
 % Mit Vorkenntnissen aus dem Blockkurs können wir aber berechnen, um welche 
 % Frequenzen es sich handelt:
