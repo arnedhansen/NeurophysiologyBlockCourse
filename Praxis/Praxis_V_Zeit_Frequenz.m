@@ -18,7 +18,7 @@ clc
 %% Pfade vorbereiten
 
 % Pfad zu den Daten
-pathToData='data/preprocessed_data'; 
+pathToData = 'data/preprocessed_data'; 
 
 % Pfad zu EEGlab
 addpath('eeglab2021.1')
@@ -47,17 +47,18 @@ figure;
 plot(fft_res)
 % Schwierig zu erkennen, welche Frequenzen hier am stärksten ausgeprägt sind
 
-% Mit Vorkenntnissen aus dem Blockkurs können wir aber berechnen, um welche 
+% Mit Vorkenntnissen aus dem Blockkurs können wir berechnen, um welche 
 % Frequenzen es sich handelt:
 
-% Wir haben 4-Sekunden-Segment und eine Abtastrate von 250 Hz
-% Kleinste schätzbare Frequenz = ??? Hz
-% Frequenzauflösung = ??? Hz
-% Grösste schätzbare Frequenz = ??? Hz
+% Wir haben eine Abtastrate von 250 Hz
+% Länge Segment = ??? s %%%%% 4 s
+% Kleinste schätzbare Frequenz = ??? Hz %%%%% 0.25 (1/T)
+% Frequenzauflösung = ??? Hz %%%%% 0.25 (1/T [s])
+% Grösste schätzbare Frequenz = ??? Hz %%%%% 125 (Abtastrate/2)
 
 frequenzen = XXX:XXX:XXX; %%%%% 0.25:0.25:125
 figure;
-plot(frequenzen,fft_res);
+plot(frequenzen,fft_res); %%%%% xline(125)
 
 %% EEGLab kann das auch, besser, und gleichzeitg für alle Kanäle!
 
@@ -81,16 +82,14 @@ figure;
 
 % Dimensionen von spec jetzt 70*126, freq bleibt unverändert, weil? %%%%%
 % 126 Frequency bins
-% Freuqenz 0 ist CHATGPT
+% Freuqenz 0 ist CHATGPT?
 size(spec)
 
 figure;
 plot(freq,spec(60,:))
 
 %% Zeit-Frequenz-Analyse
-
-% Von Hand STFT selber machen mit 1 sec segemtns über 20secs
-
+% Von Hand STFT selber machen 
 % Für die ersten 20 Sekunden
 % Verwende Segmente von 1 Sekunde
 
@@ -158,7 +157,7 @@ set(gca,'YDir','normal')
 
 EEGC_all = pop_epoch(EEG, {4,5,6,13,14,15,17,18,19}, [-0.4, 2.6]); 
 
-nCycles=0; % Anazhl an Zylen für wavelet analyse -> 0 heisst: keine Zyklen -> stattdessen Short time Fourier Transformation
+nCycles = 0; % Anazhl an Zylen für wavelet analyse -> 0 heisst: keine Zyklen -> stattdessen Short time Fourier Transformation
 
 doc pop_newtimef
 
@@ -166,40 +165,40 @@ figure;
 [ersp,~,~,times,freqs] = pop_newtimef(EEGC_all,1,channel,[-400, 2600],nCycles, 'freqs',[3 30],'plotphasesign','off','plotitc','off');
 % Plot nicht schliessen
 % Wie ist Zeitauflösung, wie ist Frequenzauflösung?
+% WAS SIND DIE BEIDEN INTEGRIERTEN PLOTS?
 
-% Vergleiche Ergebnis mit Wavelet-Analyse 
+%% Vergleiche Ergebnis der EEGLab STFT mit Wavelet-Analyse 
 
 nCycles = 5; % Wavelets mit 5 Zyklen
 figure;
-[erspWave,~,~,timesWave,freqsWave]=pop_newtimef(EEGC_all,1,channel,[-400, 2600],nCycles, 'freqs',[3 30],'plotphasesign','off','plotitc','off');
-
-%man sieht: 
+[erspWave,~,~,timesWave,freqsWave] = pop_newtimef(EEGC_all,1,channel,[-400, 2600],nCycles, 'freqs',[3 30],'plotphasesign','off','plotitc','off');
+% Man sieht: 
 % Zeit teilweise abgeschnitten (wavelets müssen ganz reinpassen - whiteboard/VISUALIESIERUNG) 
-%   Zeit insgesamt 3s
-%   5 zyklen
-%   0.33 (3Hz) langsamstse Wavelet
-%   erster Werte bei -400 + 750 = 350ms
+% Zeit insgesamt 3s
+% 5 zyklen
+% 0.33 (3Hz) langsamstse Wavelet
+% erster Werte bei -400 + 750 = 350ms
 
-% oben (hohe frequenzen), power wechselt schnell, gute
-% Zeitauflösung, aber die langen "Streifen" zeigen dass man nicht wirklich
-% unterscheiden kann zwischen den hohen frequenzen (zb. 20/30)
+% OBEN (hohe frequenzen), power wechselt schnell, gute Zeitauflösung, 
+% aber die langen "Streifen" zeigen, dass man nicht wirklich
+% unterscheiden kann zwischen den hohen Frequenzen (zb. 20/30).
 
-% unten (tiefe Frequenzen), power wechselt langsam (schlechte 
-% Zeitauflösung) 
+% UNTEN (tiefe Frequenzen), Power wechselt langsam, schlechte 
+% Zeitauflösung
 
-%% Zum schluss: Hilbert transformation
+%% Zum Schluss: Hilbert-Transformation
 
 % Für dieses Beispiel nehmen wir die Alpha-Oszillation über die
-% ersten 10 sekunden
+% ersten 10 Sekunden
 
-EEG_short=pop_select( EEG,'time',[0, 10] );
+EEG_short = pop_select( EEG,'time',[0, 10] );
 
-%zum alpha band filtern (8-13 Hz)
+% zum alpha band filtern (8-13 Hz)
 
-%TODO: Funktions-argumente ausfüllen)
-EEG_short_filt=pop_eegfiltnew(EEG_short,8,13);
+% TODO: Funktions-argumente ausfüllen)
+EEG_short_filt = pop_eegfiltnew(EEG_short,8,13);
 
-%plot: Daten vor und nach filtern 
+% Plot: Daten vor und nach filtern 
 figure;
 plot(EEG_short.times,EEG_short.data(channel,:));
 hold on;
@@ -218,7 +217,3 @@ plot(EEG_short_filt.times,EEG_short_filt.data(channel,:));
 % TODO
 hold on;
 plot(EEG_short_filt.times,alphapow)
-
-% Projekt Idee:
-% Das für alle Gesichter-trials machen und für alle "scrambled" Gesichter
-% --> Resultat vergleichen
