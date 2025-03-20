@@ -178,49 +178,51 @@ set(gca, 'FontSize', 25)
 EEGC_all = pop_epoch(EEG, {4,5,6,13,14,15,17,18,19}, [-0.4, 2.6]); 
 
 % Anzahl an Zyklen für Wavelet-Analyse
-nCycles = 0; % 0 heisst: keine Zyklen -> stattdessen STFT
+nCycles0 = 0; % 0 heisst: keine Zyklen -> stattdessen STFT
 
 % Was möchte die Funktion von uns haben?
 doc pop_newtimef
 
 % Visualisierung der STFT
 figure;
-[ersp,~,~,times,freqs] = pop_newtimef(EEGC_all, 1, channel, [-400, 2600], nCycles, 'freqs', [3 30],'plotphasesign','off','plotitc','off');
+[ersp,~,~,times,freqs] = pop_newtimef(EEGC_all, 1, channel, [-400, 2600], nCycles0, 'freqs', [3 30],'plotphasesign','off','plotitc','off');
 % Inputs
-% EEGC_all               : EEG-Datensatz
-% 1                      : Analyse der ersten Epoche
-% channel                : Elektrode 60
-% [-400, 2600]           : Analyse-Zeitfenster (ms); 400 ms vor Stimulus bis 2600 ms nach Stimulus
-% nCycles                : Parameter, der die Anzahl der Zyklen für die Wavelet-Transformation bestimmt, was das Gleichgewicht zwischen Zeit- und Frequenzauflösung beeinflusst.
-% 'freqs', [3 30]        : Parameterpaar, das den interessierenden Frequenzbereich von 3 Hz bis 30 Hz festlegt.
-% 'plotphasesign','off'  : Option, um die Darstellung der Phasensignaldaten zu deaktivieren.
-% 'plotitc','off'        : Option, um die Darstellung der Inter-Trial-Kohärenz (ITC)-Daten zu deaktivieren.
+%   EEGC_all               : EEG-Datensatz
+%   1                      : Standard-Darstellung ('typeplot')
+%   channel                : Elektrode 60
+%   [-400, 2600]           : Analyse-Zeitfenster (ms); 400 ms vor Stimulus bis 2600 ms nach Stimulus
+%   nCycles                : Anzahl der Zyklen für die Wavelet-Transformation
+%   'freqs', [3 30]        : Frequenzbereich von 3 Hz bis 30 Hz
+%   'plotphasesign', 'off' : Darstellung der Phasensignaldaten deaktivieren
+%   'plotitc', 'off'       : Darstellung der Inter-Trial-Kohärenz (ITC)-Daten deaktivieren
 
 % Outputs
-% ersp  : Matrix, die die Event-Related Spectral Perturbation (ERSP)-Werte enthält, welche aus den EEG-Daten berechnet wurden.
-% ~     : Platzhalter für eine Ausgabe (zum Beispiel ITC-Daten), die nicht gespeichert wird.
-% ~     : Platzhalter für eine weitere Ausgabe (z. B. zusätzliche statistische oder Phasendaten), die nicht gespeichert wird.
-% times : Vektor mit Zeitpunkten (in Millisekunden), die den berechneten ERSP-Daten entsprechen.
-% freqs : Vektor mit den Frequenzbändern (in Hertz), die in der Zeit-Frequenz-Analyse verwendet werden.
+%   ersp  : Matrix, die die Event-Related Spectral Perturbation (ERSP)-Werte enthält
+%   ~     : Platzhalter für eine Ausgabe (z.B. ITC-Daten), die nicht gespeichert wird
+%   times : Zeitpunkte (ms)
+%   freqs : Frequenzbänder (Hz)
 
+% Plot nicht schliessen!
+% Wie ist die Zeitauflösung, wie ist Frequenzauflösung?
 
-% Plot nicht schliessen
-% Wie ist Zeitauflösung, wie ist Frequenzauflösung?
 % WAS SIND DIE BEIDEN INTEGRIERTEN PLOTS?
 
 %% Vergleiche Ergebnis der EEGLab STFT mit Wavelet-Analyse 
 
-nCycles = 5; % Wavelets mit 5 Zyklen
+% Anzahl an Zyklen für Wavelet-Analyse
+nCycles5 = 5; % Wavelets mit 5 Zyklen
+
+% Visualisierung der STFT
 figure;
-[erspWave,~,~,timesWave,freqsWave] = pop_newtimef(EEGC_all,1,channel,[-400, 2600],nCycles, 'freqs',[3 30],'plotphasesign','off','plotitc','off');
+[erspWave,~,~,timesWave,freqsWave] = pop_newtimef(EEGC_all, 1, channel, [-400, 2600], nCycles5, 'freqs', [3 30],'plotphasesign','off','plotitc','off');
 % Man sieht: 
-% Zeit teilweise abgeschnitten (wavelets müssen ganz reinpassen - whiteboard/VISUALIESIERUNG) 
+% Zeit teilweise abgeschnitten (Wavelets müssen ganz reinpassen!) 
 % Zeit insgesamt 3s
 % 5 zyklen
-% 0.33 (3Hz) langsamstse Wavelet
+% 0.33 ms (3Hz) langsamstse Wavelet
 % erster Werte bei -400 + 750 = 350ms
 
-% OBEN (hohe frequenzen), power wechselt schnell, gute Zeitauflösung, 
+% OBEN (hohe frequenzen), Power wechselt schnell, gute Zeitauflösung, 
 % aber die langen "Streifen" zeigen, dass man nicht wirklich
 % unterscheiden kann zwischen den hohen Frequenzen (zb. 20/30).
 
@@ -229,15 +231,11 @@ figure;
 
 %% Zum Schluss: Hilbert-Transformation
 
-% Für dieses Beispiel nehmen wir die Alpha-Oszillation über die
-% ersten 10 Sekunden
-
-EEG_short = pop_select( EEG,'time',[0, 10] );
+% Für dieses Beispiel nehmen wir die Alpha-Oszillation über die ersten 10 Sekunden
+EEG_short = pop_select(EEG, 'time', [0 10]);
 
 % zum alpha band filtern (8-13 Hz)
-
-% TODO: Funktions-argumente ausfüllen)
-EEG_short_filt = pop_eegfiltnew(EEG_short,8,13);
+EEG_short_filt = pop_eegfiltnew(EEG_short, 8, 13);
 
 % Plot: Daten vor und nach filtern 
 figure;
@@ -245,16 +243,15 @@ plot(EEG_short.times,EEG_short.data(channel,:));
 hold on;
 plot(EEG_short_filt.times,EEG_short_filt.data(channel,:));
 
-%--------------
 % Alpha power extrahieren mit Hilbert Transformation
-
 alphapow = abs(hilbert(EEG_short_filt.data(channel,:)));
-%--------------
 
 % Ergebnis visualisieren:
-
 figure;
 plot(EEG_short_filt.times,EEG_short_filt.data(channel,:));
-% TODO
 hold on;
 plot(EEG_short_filt.times,alphapow)
+legend('Rohdaten im Alpha-Frequenzband (8 - 13 Hz)', 'Hilbert-Tranformierte Alpha-Power')
+ylabel('Amplitude [\muV^2]')
+xlabel('Zeit [ms]')
+set(gca, 'FontSize', 25)
