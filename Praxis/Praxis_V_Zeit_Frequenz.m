@@ -233,6 +233,7 @@ figure;
 %   5 Zyklen
 %   niedrigste FOI = 3 Hz -> d.h. 3 Zyklen pro Sekunde -> 1 Zyklus = 1/3 s
 %   darum Länge des langsamstes Wavelets = 0.33 s * 5 Zyklen = 1.67 s
+%       -> zusätzliche Visualisierung?
 
 % -> zeigen mit weniger Zyklen
 % -> zeigen mit Beispiel Marius
@@ -257,15 +258,21 @@ figure;
 plot(EEG_short.times(1:250),EEG_short.data(channel,1:250), 'LineWidth', 2);
 hold on;
 plot(EEG_short_filt.times(1:250),EEG_short_filt.data(channel,1:250), 'LineWidth', 2);
+yline(0)
+legend('Daten im Alpha-Frequenzband (8 - 13 Hz)', 'Hilbert-Tranformierte Alpha-Power')
+ylabel('Amplitude [\muV^2]')
+xlabel('Zeit [ms]')
+set(gca, 'FontSize', 25)
 
-% Alpha Power extrahieren mit Hilbert Transformation
+% Alpha Power extrahieren mit Hilbert-Transformation
 alphapow = abs(hilbert(EEG_short_filt.data(channel,:)));
 
-% Visualisierung Alpha-Frequenzband und Hilber-Transformierte Alpha Power 
+% Visualisierung Alpha-Frequenzband und Hilber-Transformierte Alpha-Power 
 figure;
 plot(EEG_short_filt.times,EEG_short_filt.data(channel,:), 'LineWidth', 2);
 hold on;
 plot(EEG_short_filt.times,alphapow, 'LineWidth', 2)
+yline(0)
 legend('Daten im Alpha-Frequenzband (8 - 13 Hz)', 'Hilbert-Tranformierte Alpha-Power')
 ylabel('Amplitude [\muV^2]')
 xlabel('Zeit [ms]')
