@@ -76,13 +76,14 @@ size(EEG.data)
 % diese 4 gemacht und gemittelt - deswegen schöneres, glatteres Resultat, (wegen Mittelwert) 
 % aber schlechtere Frequenzauflösung
 
-% FT gleichzeitig für alle Kanäle, über die gesamten Daten
+% FT gleichzeitig für alle Kanäle, über die gesamten Daten (frames = 0)
 figure;
-[spec,freq] = spectopo(EEG.data,0,EEG.srate); 
+[spec,freq] = spectopo(EEG.data, 0, EEG.srate); 
 
-% Dimensionen von spec jetzt 70*126, freq bleibt unverändert, weil? %%%%%
+% Dimensionen von spec jetzt 70*126
+% freq bleibt unverändert, weil? %%%%% 
 % 126 Frequency bins
-% Freuqenz 0 ist CHATGPT?
+% Freq 0 = Mittelwert des Signals über die Zeit (Baseline)
 size(spec)
 
 figure;
