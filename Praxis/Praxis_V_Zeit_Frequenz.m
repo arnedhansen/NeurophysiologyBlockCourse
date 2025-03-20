@@ -31,15 +31,14 @@ eeglab
 close;
 
 %% Lade alle Daten für Subject 002
-pathToData = 'data/preprocessed_data';
 load([pathToData  '/gip_sub-002.mat']);
 
 %% Fourier Transformation
 
 % Erstmal machen wir das von Hand, etwas mühsam:
 channel = 60; % Wir schauen uns das Ganze erstmal für eine Elektrode an
-fft_res = abs(fft(EEG.data(channel,1:1000))); 
-fft_res = fft_res(1:length(fft_res)/2);
+fft_res = abs(fft(EEG.data(channel,1:1000))); % 1000 Zeitpunkte = 4 Sekunden
+fft_res = fft_res(1:length(fft_res)/2); %%%%% negative FREQUENZEN
 % Wir wählen abs(fft) für die Amplitude
 % FFT liefert auch Phaseninformation - diese interessiert uns aber meist nicht
 
@@ -50,8 +49,7 @@ plot(fft_res)
 % Mit Vorkenntnissen aus dem Blockkurs können wir berechnen, um welche 
 % Frequenzen es sich handelt:
 
-% Wir haben eine Abtastrate von 250 Hz
-% Länge Segment = 4 s
+% Wir haben eine Abtastrate von 250 Hz und 4 Sekunden Daten
 % Kleinste schätzbare Frequenz = ??? Hz %%%%% 0.25 (1/T [s])
 % Frequenzauflösung = ??? Hz %%%%% 0.25 (1/T [s])
 % Grösste schätzbare Frequenz = ??? Hz %%%%% 125 (Abtastrate/2)
@@ -59,8 +57,9 @@ plot(fft_res)
 frequenzen = XXX:XXX:XXX; %%%%% 0.25:0.25:125
 figure;
 plot(frequenzen,fft_res); %%%%% xline(125)
+% Warum gehen die Amplituden bei 40 Hz auf 0?
 
-%% EEGLab kann das auch, besser, und gleichzeitg für alle Kanäle!
+%% EEGLab kann das auch, einfach, und gleichzeitg für alle Kanäle!
 
 % Was möchte die Funktion von uns haben?
 help spectopo
@@ -69,12 +68,15 @@ help spectopo
 size(EEG.data)
 
 % Frequenzanalyse mit spectopo
-[spec,freq] = spectopo(EEG.data(channel,1:1000), 0, EEG.srate);
+[spec,freq] = spectopo(EEG.data(channel, 1:1000), 0, EEG.srate);
 % Nur für eine Elektrode (60)
-% Alle Zeitpunkte
+% Alle Zeitpunkte der übergebenen Daten
 % Abtastrate = 250 Hz
+% Log-Skalierung %%%%%% log10(0.0000000001)
+% Andere Frequenzauflösung! Siehe freq
+length(freq)
 
-% Trick wurde angewandt! Welch-Spektrum
+% Warum sieht das sauberer aus? Trick wurde angewandt! Welch-Spektrum
 % Daten wurden in 4 Segmente von 1 Sekunde unterteilt, FFT über diese 
 % 4 Segmente gemacht und gemittelt - deswegen schöneres, glatteres Resultat,
 % (wegen Mittelwert), aber schlechtere Frequenzauflösung (1 / T[s])
@@ -87,6 +89,8 @@ figure;
 
 % Dimensionen von spec jetzt 70*126
 size(spec)
+% Dimensionen von freq immer noch gleich! Gleiche Frequenzen
+
 % Was ist passiert? %%%%% Verlust der Zeitinformation
 % 126 Frequency bins
 % Freq 0 = Mittelwert des Signals über die Zeit (Baseline)
@@ -96,26 +100,28 @@ figure;
 plot(freq,spec(60,:))
 
 %% Zeit-Frequenz-Analyse
-% Erstmal: von Hand STFT selber machen 
+%  Problem der Frequenz-Analyse: Verlust der Zeitinformation
 
+% Erstmal: von Hand STFT selber machen 
 % Segmente von 1 Sekunde
-winSize250 = 250; % 250 Zeitpunkte, die 4 ms auseinander liegen = 1 Sekunde
+winSize1s = 250; % 250 Zeitpunkte, die 4 ms auseinander liegen = 1 Sekunde
 % Berechnung Frequenzauflösung: 1/T [s]
 
 % STFT von Hand für die ersten 20 Sekunden
 for i = 1:20
-    start = (i-1)*winSize250+1;
-    stop = i*winSize250;
-    [spec_tf(:,i),freq_tf(i,:)] = spectopo(EEG.data(channel,start:stop), 0, EEG.srate,'plot','off','winsize', winSize250);
+    start = i * winSize1s;     % Wir starten bei Sekunde 1, nicht bei 0 %%%%% (250 Zeitpunkte * 4ms)
+    stop  = start + winSize1s; % Wir enden 1 Window Size später (1s)
+    [spec_tf(:,i),freq_tf] = spectopo(EEG.data(channel,start:stop), 0, EEG.srate,'plot','off','winsize', winSize1s);
+    disp(['Fenster Nr. ' num2str(i) ' = Zeitpunkt ' num2str(start), ' bis Zeitpunkt ', num2str(stop)])
 end
 
 % Ergebnis ansehen (diesmal nur von 2-30 Hz):
-freq1 = find(freq_tf(1,:) == 2) % Frequenz mit 2 Hz
-freq2 = find(freq_tf(1,:) == 30) % Frequenz mit 30 Hz
+freq1 = find(freq_tf == 2) % Frequenz mit 2 Hz
+freq2 = find(freq_tf == 30) % Frequenz mit 30 Hz
 
 % Visualisierung Zeit-Frequenz-Analyse für die ersten 20 Sekunden
 figure;
-imagesc(spec_tf(freq1:freq2,:), [-30 30]);
+imagesc(spec_tf(freq1:freq2, :), [-30 30]);
 colormap('turbo')
 colorbar;
 xlabel('Zeit [s]')
@@ -129,26 +135,26 @@ set(gca, 'FontSize', 25)
 % ABER: Segmente von 2 Sekunden
 
 % Segmente von 2 Sekunden
-winSize500 = 500; % 500 Zeitpunkte, die 4 ms auseinander liegen = 2 Sekunden
+winSize2s = XXX; % XXX Zeitpunkte, die 4 ms auseinander liegen = 2 Sekunden %%%%% 500 Zeitpunkte
 % Berechnung Frequenzauflösung: 1/T [s]
 
 % STFT von Hand für die ersten 20 Sekunden
-for i = 1:10
-    start = (i-1)*winSize500+1;
-    stop = i*winSize500;
-    [spec_tf2(:,i),freq_tf2(i,:)] = spectopo(EEG.data(channel,start:stop), 0, EEG.srate,'plot','off','winsize', winSize500);
+for i = XXX:XXX %%%%% 1:10
+    start = i * winSize2s;     % Wir starten bei Sekunde 2, nicht bei 0  %%%%% (500 Zeitpunkte * 4ms)
+    stop  = start + winSize2s; % Wir enden 1 Window Size später (2s)
+    [spec_tf2(:,i),freq_tf2] = spectopo(EEG.data(channel,start:stop), 0, EEG.srate,'plot','off','winsize', winSize2s);
 end
 
 % Ergebnis ansehen:
-freq1B = find(freq_tf2(1,:) == 2)
-freq2B = find(freq_tf2(1,:) == 30)
-plotFreqB = freq_tf2(1,freq1B:freq2B); % Frequenzachse (y-Achse) von 2 bis 30 Hz
+freq1B = find(freq_tf2 == 2)
+freq2B = find(freq_tf2 == 30)
+plotFreqB = freq_tf2(freq1B:freq2B); % Frequenzachse (y-Achse) von 2 bis 30 Hz
 
 % ABER: Wie viele Frequenz-Bins?
-size(plotFreqB, 2)
+length(plotFreqB)
 % Berechnung Frequenzauflösung: 1/T [s]
 % 57 Frequenz-Bins, weil plotFreqB von 2 bis 30 Hz geht in Schritten von 0.5 Hz
-zeitB = 1:2:20; % Zeitachse von 1 bis 20 Sekunden (2 Sek-Schritte!)
+zeitB = 2:2:20; % Zeitachse von 1 bis 20 Sekunden (2 Sek-Schritte!)
 
 % Plotten (mit korrigierter x- und y-Achse)
 figure;
@@ -174,7 +180,7 @@ set(gca, 'FontSize', 25)
 %% Neue Fragestellung:
 %  Wie verändert sich das Frequenzspektrum nach Präsentation eines Stimulus?
 
-% Zuerst: Daten segmentieren!
+% Zuerst: Daten segmentieren! Um die Stimuli herum 3s
 EEGC_all = pop_epoch(EEG, {4,5,6,13,14,15,17,18,19}, [-0.4, 2.6]); 
 
 % Anzahl an Zyklen für Wavelet-Analyse
@@ -204,8 +210,13 @@ figure;
 
 % Plot nicht schliessen!
 % Wie ist die Zeitauflösung, wie ist Frequenzauflösung?
+freqs
+% Frequenzauflösung ca. 1 Hz
+% Zeitfenster von ca. 1s
+times(1:20) % Schritte von 10ms (wird automatisch definiert)
+% Überlappende Windows!
 
-% WAS SIND DIE BEIDEN INTEGRIERTEN PLOTS?
+%%%%% müsste bei 100 ms anfangen, aber wegen zero-padding beginnts früher
 
 %% Vergleiche Ergebnis der EEGLab STFT mit Wavelet-Analyse 
 
@@ -216,17 +227,21 @@ nCycles5 = 5; % Wavelets mit 5 Zyklen
 figure;
 [erspWave,~,~,timesWave,freqsWave] = pop_newtimef(EEGC_all, 1, channel, [-400, 2600], nCycles5, 'freqs', [3 30],'plotphasesign','off','plotitc','off');
 % Man sieht: 
-% Zeit teilweise abgeschnitten (Wavelets müssen ganz reinpassen!) 
-% Zeit insgesamt 3s
-% 5 zyklen
-% 0.33 ms (3Hz) langsamstse Wavelet
-% erster Werte bei -400 + 750 = 350ms
+%   Zeit teilweise abgeschnitten (Wavelets müssen ganz reinpassen!) 
+%       -> zeigen auf Slides!
+%   Datenlänge insgesamt 3s
+%   5 Zyklen
+%   niedrigste FOI = 3 Hz -> d.h. 3 Zyklen pro Sekunde -> 1 Zyklus = 1/3 s
+%   darum Länge des langsamstes Wavelets = 0.33 s * 5 Zyklen = 1.67 s
 
-% OBEN (hohe frequenzen), Power wechselt schnell, gute Zeitauflösung, 
-% aber die langen "Streifen" zeigen, dass man nicht wirklich
-% unterscheiden kann zwischen den hohen Frequenzen (zb. 20/30).
+% -> zeigen mit weniger Zyklen
+% -> zeigen mit Beispiel Marius
 
-% UNTEN (tiefe Frequenzen), Power wechselt langsam, schlechte 
+% OBEN (hohe frequenzen: Bsp. 20 - 30 Hz), Power wechselt schnell, gute 
+% Zeitauflösung, aber die langen "Streifen" zeigen, dass man nicht wirklich
+% unterscheiden kann zwischen den hohen Frequenzen
+
+% UNTEN (tiefe Frequenzen: Bsp. 3 - 5 Hz), Power wechselt langsam, schlechte 
 % Zeitauflösung
 
 %% Zum Schluss: Hilbert-Transformation
@@ -234,24 +249,24 @@ figure;
 % Für dieses Beispiel nehmen wir die Alpha-Oszillation über die ersten 10 Sekunden
 EEG_short = pop_select(EEG, 'time', [0 10]);
 
-% zum alpha band filtern (8-13 Hz)
+% Alphaband filtern (8-13 Hz)
 EEG_short_filt = pop_eegfiltnew(EEG_short, 8, 13);
 
-% Plot: Daten vor und nach filtern 
+% Visualisierung der Daten vor und nach dem Filtern für die erste Sekunde
 figure;
-plot(EEG_short.times,EEG_short.data(channel,:));
+plot(EEG_short.times(1:250),EEG_short.data(channel,1:250), 'LineWidth', 2);
 hold on;
-plot(EEG_short_filt.times,EEG_short_filt.data(channel,:));
+plot(EEG_short_filt.times(1:250),EEG_short_filt.data(channel,1:250), 'LineWidth', 2);
 
-% Alpha power extrahieren mit Hilbert Transformation
+% Alpha Power extrahieren mit Hilbert Transformation
 alphapow = abs(hilbert(EEG_short_filt.data(channel,:)));
 
-% Ergebnis visualisieren:
+% Visualisierung Alpha-Frequenzband und Hilber-Transformierte Alpha Power 
 figure;
-plot(EEG_short_filt.times,EEG_short_filt.data(channel,:));
+plot(EEG_short_filt.times,EEG_short_filt.data(channel,:), 'LineWidth', 2);
 hold on;
-plot(EEG_short_filt.times,alphapow)
-legend('Rohdaten im Alpha-Frequenzband (8 - 13 Hz)', 'Hilbert-Tranformierte Alpha-Power')
+plot(EEG_short_filt.times,alphapow, 'LineWidth', 2)
+legend('Daten im Alpha-Frequenzband (8 - 13 Hz)', 'Hilbert-Tranformierte Alpha-Power')
 ylabel('Amplitude [\muV^2]')
 xlabel('Zeit [ms]')
 set(gca, 'FontSize', 25)
