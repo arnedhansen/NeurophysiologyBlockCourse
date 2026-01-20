@@ -7,7 +7,7 @@
 % 
 % Schreibt euren Code direkt in die Felder unterhalb der Frage. Bitte 
 % stellt sicher, dass ihr alle Felder ausgefüllt habt, bevor ihr das Skript
-% bis am 27.02. 23:59 an Arne (arne.hansen@psychologie.uzh.ch) sendet.
+% an Arne (arne.hansen@psychologie.uzh.ch) sendet.
 %
 % Um den Code hier laufen zu lassen, könnt ihr entweder auf den grünen Pfeil
 % oben ('Run') drücken, oder in eine Aufgaben-Box klicken und oben 'Run
