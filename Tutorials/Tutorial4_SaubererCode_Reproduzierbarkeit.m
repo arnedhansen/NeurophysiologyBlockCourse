@@ -4,11 +4,27 @@
 % Blockkurs mit echten EEG‑Daten arbeitest.
 %
 % Inhalte:
+% 0. Einführung
 % 1. Warum saubere Skripte wichtig sind
 % 2. Struktur von Analyse‑Skripten
+%    2.1 Beispiel: Grundstruktur
 % 3. Schleifen über Subjekte und Bedingungen
+%    3.1 Schleife über Subjekte
+%    3.2 Verschachtelte Schleifen: Subjekte und Bedingungen
 % 4. Funktionen schreiben
+%    4.1 Einfache Funktion
+%    4.2 Funktion mit mehreren Ausgaben
+%    4.3 Funktion für einen Vorverarbeitungsschritt
 % 5. Mini‑Projekt: kleine Analyse‑Pipeline
+%    5.1 Beispiel‑Code‑Skeleton
+%    5.2 Tipps für gute Pipeline‑Struktur
+% 6. Fehlerbehandlung
+%    6.1 try‑catch für robuste Skripte
+%    6.2 warning vs. error
+% 7. Debugging‑Tipps
+%    7.1 Ausgaben mit disp und fprintf
+%    7.2 Timing mit tic und toc
+%    7.3 Workspace inspizieren
 
 %% 0. Einführung
 % Bisher hast du in den Tutorials hauptsächlich kurze Code‑Beispiele gesehen,
@@ -340,6 +356,108 @@ Ergebnisse
 %
 % 5. **Prüfe auf Fehler**: Verwende `isfile`, `exist` oder `try‑catch`, um
 %    Fehler abzufangen, bevor sie das ganze Skript zum Absturz bringen.
+
+%% 6. Fehlerbehandlung
+% Wenn du mit vielen Dateien oder komplexen Analysen arbeitest, können Fehler
+% auftreten. Gute Fehlerbehandlung sorgt dafür, dass dein Skript nicht komplett
+% abstürzt, wenn etwas schiefgeht.
+
+%% 6.1 try‑catch für robuste Skripte
+% Die `try‑catch`‑Struktur erlaubt es dir, Fehler abzufangen und darauf zu
+% reagieren, ohne dass das ganze Skript stoppt:
+
+% Beispiel: Versuche, Daten zu laden, fange Fehler ab
+% for s = 1:length(subjekte)
+%     subj_id = subjekte(s);
+%     dateiname = sprintf("gip_sub-%03d.mat", subj_id);
+%     vollpfad = fullfile(pfad_daten, dateiname);
+%     
+%     try
+%         load(vollpfad);
+%         fprintf("Subjekt %d erfolgreich geladen.\n", subj_id);
+%         % Hier würdest du die Analyse durchführen
+%     catch ME
+%         warning("Fehler beim Laden von Subjekt %d: %s", subj_id, ME.message);
+%         continue;  % Überspringe dieses Subjekt und gehe zum nächsten
+%     end
+% end
+
+% Die `try`‑Sektion enthält den Code, der fehlschlagen könnte. Wenn ein Fehler
+% auftritt, wird die `catch`‑Sektion ausgeführt. `ME` (MException) enthält
+% Informationen über den Fehler, z.B. `ME.message` für die Fehlermeldung.
+%
+% WICHTIGER HINWEIS: `try‑catch` sollte sparsam verwendet werden. Es ist besser,
+% Fehler zu vermeiden (z.B. mit `isfile` prüfen, ob eine Datei existiert), als
+% sie abzufangen. Aber für unvorhersehbare Fehler (z.B. beschädigte Dateien) ist
+% `try‑catch` sehr nützlich.
+
+%% 6.2 warning vs. error
+% MATLAB bietet zwei Arten von Meldungen:
+% - `warning`: Gibt eine Warnung aus, aber das Skript läuft weiter
+% - `error`: Stoppt das Skript mit einer Fehlermeldung
+
+% Beispiel: Warning für fehlende Dateien
+% if ~isfile(vollpfad)
+%     warning("Datei %s nicht gefunden, wird übersprungen.", vollpfad);
+%     continue;
+% end
+
+% Beispiel: Error für kritische Fehler
+% if isempty(EEG.data)
+%     error("EEG-Daten sind leer! Analyse kann nicht durchgeführt werden.");
+% end
+
+% Verwende `warning` für Probleme, die nicht kritisch sind (z.B. fehlende
+% Dateien, die übersprungen werden können). Verwende `error` für kritische
+% Probleme, die die Analyse unmöglich machen (z.B. leere Daten).
+
+%% 7. Debugging‑Tipps
+% Wenn dein Code nicht funktioniert, musst du herausfinden, warum. Hier sind
+% einige nützliche Techniken:
+
+%% 7.1 Ausgaben mit disp und fprintf
+% Die einfachste Methode ist, Zwischenwerte auszugeben:
+
+% Beispiel: Ausgabe während einer Schleife
+% for s = 1:length(subjekte)
+%     subj_id = subjekte(s);
+%     fprintf("Verarbeite Subjekt %d ...\n", subj_id);
+%     
+%     % Hier würdest du die Analyse durchführen
+%     % Wenn etwas schiefgeht, siehst du, bei welchem Subjekt es passiert ist
+% end
+
+% `fprintf` ist flexibler als `disp`, weil du formatierte Ausgaben erstellen
+% kannst. `%d` steht für eine ganze Zahl, `%s` für Text, `\n` für einen
+% Zeilenumbruch.
+
+%% 7.2 Timing mit tic und toc
+% Wenn dein Code langsam ist, möchtest du vielleicht wissen, wie lange bestimmte
+% Teile dauern:
+
+% tic;  % Starte Timer
+% % Hier kommt dein Code, der lange dauert
+% % z.B. eine Schleife über alle Subjekte
+% for s = 1:length(subjekte)
+%     % Analyse durchführen
+% end
+% elapsed_time = toc;  % Stoppe Timer und speichere Zeit
+% fprintf("Analyse dauerte %.2f Sekunden.\n", elapsed_time);
+
+% `tic` startet einen Timer, `toc` stoppt ihn und gibt die vergangene Zeit
+% zurück. Das hilft dir, zu identifizieren, welche Teile deines Codes langsam
+% sind.
+
+%% 7.3 Workspace inspizieren
+% Wenn etwas nicht funktioniert, schaue dir die Variablen im Workspace an:
+
+% size(EEG.data)      % Dimensionen prüfen
+% class(EEG.data)     % Datentyp prüfen
+% isempty(EEG.data)   % Prüfen, ob leer
+% unique([EEG.event.type])  % Einzigartige Event‑Typen sehen
+
+% Diese Befehle helfen dir, zu verstehen, was in deinen Variablen steht und
+% warum etwas nicht funktioniert.
 
 %% Zusammenfassung
 % In diesem Tutorial hast du gelernt:

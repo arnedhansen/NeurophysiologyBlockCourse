@@ -3,11 +3,35 @@
 % eine MATLAB‑Toolbox für die Analyse von EEG‑Daten.
 %
 % Inhalte:
+% 0. Einführung
 % 1. Überblick: Was ist EEGLAB?
+%    1.1 Die EEG‑Struktur
 % 2. Daten laden und inspizieren
+%    2.1 Grundlegende Informationen anzeigen
+%    2.1.1 Mehrere Dateien auflisten und laden
+%    2.2 Rohsignal visualisieren mit eegplot
+%    2.3 Einzelne Kanäle plotten
+%    2.4 Kanalpositionen visualisieren mit pop_chanedit
+%    2.4.1 Kanäle nach Namen finden
+%    2.5 Topographien plotten mit topoplot
+%    2.5.1 topoplot-Optionen
 % 3. Ereignisse und Epochen
+%    3.1 Events inspizieren
+%    3.1.1 Events filtern und finden
+%    3.2 Epochen definieren mit pop_epoch
+%    3.3 Baseline‑Korrektur mit pop_rmbase
 % 4. Grundlagen der Vorverarbeitung
+%    4.1 Re‑Referenzierung mit reref
+%    4.2 Filtern mit pop_eegfiltnew
+%    4.3 Daten ausschneiden mit pop_select
 % 5. Einfache ERPs
+%    5.1 ERP berechnen
+%    5.2 ERP plotten
+%    5.3 Vergleich zwischen Bedingungen
+%    5.4 Zeitpunkte finden
+%    5.5 Topographien für ERPs
+%    5.6 Grand Average berechnen
+%    5.7 Plot‑Formatierung für Publikationen
 
 %% 0. Einführung
 % In diesem Tutorial lernst du, wie du mit EEGLAB arbeitest, einer
@@ -88,6 +112,37 @@
 % Bei epoched Daten (mit Epochen) ist das:
 % [Anzahl Kanäle, Anzahl Zeitpunkte pro Epoche, Anzahl Epochen]
 
+%% 2.1.1 Mehrere Dateien auflisten und laden
+% Oft möchtest du mehrere Datensätze nacheinander laden, z.B. für alle
+% Versuchspersonen. Dafür kannst du die Funktion `dir` verwenden, um alle
+% Dateien in einem Ordner aufzulisten:
+
+% Beispiel: Alle Dateien mit "sub" im Namen auflisten
+% pathToData = 'data/preprocessed_data';
+% d = dir([pathToData, filesep, '*sub*']);
+
+% Die Funktion `dir` gibt eine Struktur zurück, die Informationen über die
+% Dateien enthält. `filesep` ist eine plattformunabhängige Variable, die den
+% richtigen Trennzeichen für Pfade verwendet (z.B. `/` auf Mac/Linux, `\` auf
+% Windows). Das Wildcard `*sub*` findet alle Dateien, die "sub" im Namen haben.
+%
+% Du kannst dann über die Dateien iterieren:
+
+% for sub = 1:length(d)
+%     dateiname = d(sub).name;
+%     vollpfad = fullfile(d(sub).folder, dateiname);
+%     load(vollpfad);
+%     % Hier würdest du dann die Analyse durchführen
+% end
+
+% Die Funktion `fullfile` erstellt einen vollständigen Pfad, der auf jedem
+% Betriebssystem funktioniert. `d(sub).folder` gibt den Ordnerpfad, `d(sub).name`
+% den Dateinamen zurück.
+%
+% WICHTIGER HINWEIS: `dir` gibt auch Ordner zurück (z.B. `.` und `..`). Wenn du
+% nur Dateien möchtest, kannst du prüfen, ob `d(sub).isdir` false ist, oder du
+% verwendest ein spezifischeres Wildcard‑Pattern wie `'*sub*.mat'`.
+
 %% 2.2 Rohsignal visualisieren mit eegplot
 % Die Funktion `eegplot` zeigt dir das gesamte EEG‑Signal in einem
 % interaktiven Fenster. Du kannst durch die Daten scrollen und alle Kanäle
@@ -149,6 +204,35 @@
 % Elektroden. Das hilft dir, zu verstehen, welche Kanäle frontal, zentral,
 % parietal, etc. sind.
 
+%% 2.4.1 Kanäle nach Namen finden
+% Oft möchtest du einen bestimmten Kanal verwenden, kennst aber nicht seinen
+% Index, sondern nur seinen Namen (z.B. "EEG065" oder "Cz"). Du kannst den
+% Index mit `find` und `ismember` finden:
+
+% Beispiel: Finde Kanal "EEG065"
+% kanalname = 'EEG065';
+% i65 = find(ismember({EEG.chanlocs.labels}, kanalname));
+
+% Die Funktion `ismember` prüft, ob ein Element in einem Array enthalten ist.
+% `{EEG.chanlocs.labels}` konvertiert die Kanalnamen in ein Zell‑Array, damit
+% `ismember` sie vergleichen kann. `find` gibt dann den Index zurück, an dem
+% der Kanalname gefunden wurde.
+%
+% Du kannst dann diesen Index verwenden, um auf die Daten zuzugreifen:
+
+% EEG.data(i65, :)  % Alle Daten von Kanal "EEG065"
+
+% WICHTIGER HINWEIS: Wenn der Kanalname nicht gefunden wird, gibt `find` einen
+% leeren Vektor zurück. Du solltest prüfen, ob `i65` nicht leer ist, bevor du
+% ihn verwendest:
+
+% i65 = find(ismember({EEG.chanlocs.labels}, kanalname));
+% if ~isempty(i65)
+%     % Kanal gefunden, verwende i65
+% else
+%     warning('Kanal %s nicht gefunden!', kanalname);
+% end
+
 %% 2.5 Topographien plotten mit topoplot
 % Eine Topographie (topography) zeigt dir, wie die elektrische Aktivität über
 % den Kopf verteilt ist zu einem bestimmten Zeitpunkt. Das ist wie eine
@@ -174,6 +258,37 @@
 % "alle Kanäle". Das ist wichtig für `topoplot`, das einen Vektor mit einem
 % Wert pro Kanal erwartet.
 
+%% 2.5.1 topoplot-Optionen
+% `topoplot` hat viele Optionen, um die Darstellung anzupassen:
+
+% Beispiel: Elektroden anzeigen
+% figure;
+% topoplot(EEG.data(:, timePnt), EEG.chanlocs, 'electrodes', 'on')
+% colorbar;
+% title('Topography with electrodes')
+
+% Die Option `'electrodes', 'on'` zeigt die Positionen der Elektroden als
+% Punkte an. Du kannst auch `'electrodes', 'labels'` verwenden, um die
+% Kanalnamen anzuzeigen:
+
+% figure;
+% topoplot([], EEG.chanlocs, 'style', 'blank', 'electrodes', 'labels')
+% title('Blank topography with channel labels')
+
+% Hier verwendest du `[]` als ersten Parameter (keine Daten) und `'style',
+% 'blank'`, um eine leere Topographie zu erstellen, die nur die Kanalpositionen
+% zeigt. Das ist nützlich, um zu sehen, welche Kanäle wo sind.
+%
+% Weitere nützliche Optionen:
+% - `'electrodes', 'on'`: Zeigt Elektroden als Punkte
+% - `'electrodes', 'labels'`: Zeigt Kanalnamen
+% - `'electrodes', 'off'`: Versteckt Elektroden (Standard)
+% - `'style', 'blank'`: Leere Topographie (nur Elektroden, keine Daten)
+%
+% WICHTIGER HINWEIS: Die Optionen werden als Name‑Wert‑Paare übergeben (z.B.
+% `'electrodes', 'on'`). Die Reihenfolge ist wichtig: zuerst der Optionsname
+% (als String), dann der Wert.
+
 %% 3. Ereignisse und Epochen
 % Die meisten EEG‑Experimente arbeiten ereignisbezogen (event‑related). Das
 % bedeutet, dass bestimmte Ereignisse (Events) während der Aufnahme markiert
@@ -195,6 +310,32 @@
 % Millisekunden! Wenn du wissen möchtest, wann ein Event in ms aufgetreten
 % ist, musst du `latency` durch die Samplingrate teilen und mit 1000
 % multiplizieren, oder du verwendest `EEG.times(latency)`.
+
+%% 3.1.1 Events filtern und finden
+% Oft möchtest du nur bestimmte Event‑Typen verwenden. Du kannst Events
+% filtern, indem du prüfst, welche Events einen bestimmten Typ haben:
+
+% Beispiel: Finde alle Events vom Typ "5"
+% event_types = {EEG.event.type};  % Konvertiere zu Zell‑Array
+% events_typ5 = strcmp(event_types, '5');  % Oder: events_typ5 = [EEG.event.type] == 5
+% indices_typ5 = find(events_typ5);
+
+% Wenn die Event‑Typen Zahlen sind (nicht Strings), kannst du sie direkt
+% vergleichen:
+
+% event_types_num = [EEG.event.type];  % Konvertiere zu numerischem Array
+% indices_typ5 = find(event_types_num == 5);
+
+% Du kannst dann diese Indizes verwenden, um nur bestimmte Events zu
+% verwenden, z.B. für `pop_epoch`:
+
+% EEGC1 = pop_epoch(EEG, {5, 6, 7}, [-0.2 0.8]);  % Epochen für Events 5, 6, 7
+
+% WICHTIGER HINWEIS: Event‑Typen können sowohl Zahlen als auch Strings sein.
+% Wenn sie Zahlen sind, kannst du sie direkt vergleichen (`==`). Wenn sie
+% Strings sind, musst du `strcmp` verwenden. In den Praxis‑Skripten werden
+% meist Zahlen verwendet (z.B. 5, 6, 7 für eine Bedingung, 13, 14, 15 für
+% eine andere).
 
 %% 3.2 Epochen definieren mit pop_epoch
 % Epochen (epochs) sind Zeitfenster um bestimmte Events herum. Beispielsweise
@@ -391,7 +532,25 @@
 % Differenz zwischen den Bedingungen zeigt dir, wo sich die Bedingungen
 % unterscheiden.
 
-%% 5.4 Topographien für ERPs
+%% 5.4 Zeitpunkte finden
+% Oft möchtest du einen bestimmten Zeitpunkt im Zeitvektor finden, z.B. um ein
+% Zeitfenster für eine Topographie zu definieren. Du kannst `find` verwenden:
+
+% Beispiel: Finde Zeitpunkt 152 ms
+% a = find(EEGC1.times == 152, 1);
+
+% Die Funktion `find` gibt alle Indizes zurück, an denen die Bedingung erfüllt
+% ist. Das `, 1` am Ende gibt nur den ersten Index zurück (falls es mehrere
+% gäbe, was bei exakten Zeitpunkten normalerweise nicht der Fall ist).
+%
+% WICHTIGER HINWEIS: `find(EEGC1.times == 152, 1)` findet den exakten Zeitpunkt
+% 152 ms. Wenn dieser Zeitpunkt nicht existiert (z.B. weil die Samplingrate
+% nicht genau 152 ms erlaubt), gibt `find` einen leeren Vektor zurück. Du
+% kannst auch nach dem nächsten Zeitpunkt suchen:
+
+% a = find(EEGC1.times >= 152, 1);  % Erster Zeitpunkt >= 152 ms
+
+%% 5.5 Topographien für ERPs
 % Du kannst auch Topographien für bestimmte Zeitfenster im ERP erstellen:
 
 % Beispiel: Topographie für Zeitfenster 152-212 ms (z.B. um N170 Peak)
@@ -411,6 +570,73 @@
 % (Zeitpunkte), nicht über die Zeilen (Kanäle). Das zweite Argument `2` gibt
 % die Dimension an, über die gemittelt wird. Das Ergebnis ist ein
 % Spaltenvektor mit einem Wert pro Kanal.
+
+%% 5.6 Grand Average berechnen
+% Wenn du Daten von mehreren Versuchspersonen hast, möchtest du oft ein Grand
+% Average (GA) berechnen – den Mittelwert über alle Versuchspersonen. Das
+% reduziert Rauschen und zeigt die durchschnittliche Reaktion über alle VPs.
+
+% Beispiel: Grand Average über mehrere Subjekte
+% Angenommen, du hast für jede VP ein ERP gespeichert:
+% ERP1(sub, :, :) = mean(EEGC1.data(:, :, :), 3);  % Für jede VP
+
+% Grand Average berechnen:
+% GM1 = squeeze(mean(ERP1, 1));
+
+% Die Funktion `squeeze` entfernt Dimensionen der Grösse 1. `mean(ERP1, 1)`
+% mittelt über die erste Dimension (Subjekte), was eine Matrix mit Dimensionen
+% [1, Kanäle, Zeitpunkte] ergibt. `squeeze` entfernt die erste Dimension, sodass
+% du eine Matrix mit [Kanäle, Zeitpunkte] erhältst.
+%
+% WICHTIGER HINWEIS: `squeeze` ist wichtig, wenn du über eine Dimension
+% mittelst, die danach die Grösse 1 hat. Ohne `squeeze` hättest du eine
+% 3D‑Matrix mit einer Dimension der Grösse 1, was bei vielen Funktionen
+% Probleme verursachen kann.
+
+%% 5.7 Plot‑Formatierung für Publikationen
+% Wenn du Plots für Publikationen oder Präsentationen erstellst, möchtest du
+% sie oft professionell formatieren. Hier sind einige nützliche Befehle:
+
+% Beispiel: Professionell formatierter Plot
+% figure;
+% plot(EEGC1.times, ERP1(kanal_index, :), 'LineWidth', 2, 'Color', 'red')
+% hold on
+% plot(EEGC1.times, ERP2(kanal_index, :), 'LineWidth', 2, 'Color', 'blue')
+% xlabel('Time (ms)')
+% ylabel('Voltage (\muV)')
+% legend('Bedingung 1', 'Bedingung 2')
+% set(gca, 'FontSize', 16)      % Grössere Schrift für Achsen
+% set(gcf, 'Color', 'w')         % Weisser Hintergrund
+% grid on
+
+% Die Funktion `set` ändert Eigenschaften von Grafiken:
+% - `gca` (get current axes): bezieht sich auf die aktuellen Achsen
+% - `gcf` (get current figure): bezieht sich auf die aktuelle Figure
+%
+% Nützliche Eigenschaften:
+% - `'FontSize', 16`: Grössere Schrift für bessere Lesbarkeit
+% - `'Color', 'w'`: Weisser Hintergrund (statt grau)
+% - `'LineWidth', 2`: Dickere Linien für bessere Sichtbarkeit
+%
+% Für mehrere Subplots kannst du auch `sgtitle` verwenden:
+
+% figure;
+% subplot(3, 1, 1)
+% plot(EEGC1.times, ERP1_65)
+% title('Familiar')
+% subplot(3, 1, 2)
+% plot(EEGC1.times, ERP2_65)
+% title('Unfamiliar')
+% subplot(3, 1, 3)
+% plot(EEGC1.times, ERP3_65)
+% title('Scrambled')
+% sgtitle('Variability between subjects across conditions')
+
+% `sgtitle` fügt einen Gesamttitel über alle Subplots hinzu.
+%
+% WICHTIGER HINWEIS: `set(gca, ...)` und `set(gcf, ...)` müssen nach dem Plot
+% aufgerufen werden, damit sie wirksam werden. Du kannst sie auch kombinieren:
+% `set(gca, 'FontSize', 16, 'FontName', 'Arial')`.
 
 %% Zusammenfassung
 % In diesem Tutorial hast du gelernt:

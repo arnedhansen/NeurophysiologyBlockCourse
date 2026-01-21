@@ -4,11 +4,28 @@
 % Verständnis von EEG‑Analysen wichtig sind.
 %
 % Inhalte:
+% 0. Einführung
 % 1. Signale in der Zeitdomäne
+%    1.1 Was ist ein Signal? Beispiele aus EEG
+%    1.2 Diskrete vs. kontinuierliche Signale
+%    1.3 Samplingrate und Nyquist‑Frequenz
 % 2. Aliasing verstehen
+%    2.1 Intuition: zu selten abtasten
+%    2.2 Aliasing‑Simulation in MATLAB
+%    2.3 Praktische Konsequenzen für EEG‑Aufnahmen
 % 3. Signale in der Frequenzdomäne
+%    3.1 Sinuswellen und Frequenzen
+%    3.2 Fourier‑Transformation in MATLAB (fft)
+%    3.3 Amplituden‑ und Leistungsspektren
 % 4. Filtern von Signalen
+%    4.1 Warum filtern wir EEG?
+%    4.2 Hochpass‑, Tiefpass‑, Bandpass‑Filter
+%    4.3 Einfache Filter‑Beispiele in MATLAB
+%    4.4 Visualisierung: Signal vor und nach Filterung
 % 5. Kurze Einführung Zeit‑Frequenz‑Analyse
+%    5.1 Idee der Short‑Time Fourier Transform (STFT)
+%    5.2 Fensterlänge und Zeit‑Frequenz‑Trade‑off
+%    5.3 Erste Zeit‑Frequenz‑Plots
 
 %% 0. Einführung
 % In diesem Tutorial vertiefst du dein Verständnis für digitale Signale und

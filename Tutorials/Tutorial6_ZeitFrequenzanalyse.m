@@ -4,11 +4,24 @@
 % frequenzspezifische Dynamik von EEG‑Daten analysieren kannst.
 %
 % Inhalte:
+% 0. Einführung
 % 1. Motivation: Warum Zeit‑Frequenz?
 % 2. Fourier‑Transformation und Power‑Spektrum
+%    2.1 FFT von Hand
+%    2.2 Power‑Spektrum mit spectopo
+%    2.3 Power‑Spektrum für alle Kanäle
 % 3. Zeit‑Frequenz‑Analyse: STFT von Hand
+%    3.1 STFT mit spectopo von Hand
+%    3.2 Visualisierung der Zeit‑Frequenz‑Darstellung
+%    3.3 Zeit‑Frequenz‑Trade‑off
 % 4. Zeit‑Frequenz‑Analyse mit EEGLAB
+%    4.1 Vorbereitung: Epochen erstellen
+%    4.2 STFT mit pop_newtimef
+%    4.3 Wavelet‑Analyse mit pop_newtimef
 % 5. Hilbert‑Transformation für Frequenzband‑Power
+%    5.1 Daten filtern
+%    5.2 Hilbert‑Transformation
+%    5.3 Visualisierung
 
 %% 0. Einführung
 % Bisher hast du gelernt, wie du ERPs (Event‑Related Potentials) berechnest,
