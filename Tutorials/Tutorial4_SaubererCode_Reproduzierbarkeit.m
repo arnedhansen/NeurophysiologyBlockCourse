@@ -4,27 +4,28 @@
 % Blockkurs mit echten EEG‑Daten arbeitest.
 %
 % Inhalte:
-% 0. Einführung
-% 1. Warum saubere Skripte wichtig sind
-% 2. Struktur von Analyse‑Skripten
-%    2.1 Beispiel: Grundstruktur
-% 3. Schleifen über Subjekte und Bedingungen
-%    3.1 Schleife über Subjekte
-%    3.2 Verschachtelte Schleifen: Subjekte und Bedingungen
-% 4. Funktionen schreiben
-%    4.1 Einfache Funktion
-%    4.2 Funktion mit mehreren Ausgaben
-%    4.3 Funktion für einen Vorverarbeitungsschritt
-% 5. Mini‑Projekt: kleine Analyse‑Pipeline
-%    5.1 Beispiel‑Code‑Skeleton
-%    5.2 Tipps für gute Pipeline‑Struktur
-% 6. Fehlerbehandlung
-%    6.1 try‑catch für robuste Skripte
-%    6.2 warning vs. error
-% 7. Debugging‑Tipps
-%    7.1 Ausgaben mit disp und fprintf
-%    7.2 Timing mit tic und toc
-%    7.3 Workspace inspizieren
+% 
+% - 0. Einführung
+% - 1. Warum saubere Skripte wichtig sind
+% - 2. Struktur von Analyse‑Skripten
+%   - 2.1 Beispiel: Grundstruktur
+% - 3. Schleifen über Subjekte und Bedingungen
+%   - 3.1 Schleife über Subjekte
+%   - 3.2 Verschachtelte Schleifen: Subjekte und Bedingungen
+% - 4. Funktionen schreiben
+%   - 4.1 Einfache Funktion
+%   - 4.2 Funktion mit mehreren Ausgaben
+%   - 4.3 Funktion für einen Vorverarbeitungsschritt
+% - 5. Mini‑Projekt: kleine Analyse‑Pipeline
+%   - 5.1 Beispiel‑Code‑Skeleton
+%   - 5.2 Tipps für gute Pipeline‑Struktur
+% - 6. Fehlerbehandlung
+%   - 6.1 try‑catch für robuste Skripte
+%   - 6.2 warning vs. error
+% - 7. Debugging‑Tipps
+%   - 7.1 Ausgaben mit disp und fprintf
+%   - 7.2 Timing mit tic und toc
+%   - 7.3 Workspace inspizieren
 
 %% 0. Einführung
 % Bisher hast du in den Tutorials hauptsächlich kurze Code‑Beispiele gesehen,
@@ -50,6 +51,7 @@
 % du gemacht hast.
 %
 % Typische Probleme bei schlecht strukturiertem Code:
+%
 % - "Klick‑Analyse" nur über GUIs: Du hast alles per Mausklick gemacht, aber
 %   keine Aufzeichnung, welche Schritte du durchgeführt hast
 % - Copy‑Paste von Code: Du hast denselben Codeblock 10‑mal kopiert und
@@ -59,6 +61,7 @@
 %   welche Version der Daten enthält
 %
 % Guter Code vermeidet diese Probleme, indem er:
+%
 % - alle Schritte dokumentiert (mit Kommentaren)
 % - wiederholbare Operationen in Schleifen oder Funktionen auslagert
 % - klare Struktur hat (Parameter am Anfang, dann Verarbeitung, dann Speicherung)
@@ -68,10 +71,15 @@
 %
 % 1. **Konfiguration / Parameter**: Alle wichtigen Werte werden am Anfang
 %    definiert (z.B. welche Subjekte, welche Bedingungen, welche Zeitfenster)
+% 
 % 2. **Pfade setzen**: Wo liegen die Daten? Wo sollen Ergebnisse gespeichert werden?
+% 
 % 3. **Daten laden**: Daten werden geladen (oft in einer Schleife über Subjekte)
+% 
 % 4. **Vorverarbeitung**: Daten werden bereinigt, gefiltert, etc.
+% 
 % 5. **Auswertung**: Die eigentliche Analyse wird durchgeführt
+% 
 % 6. **Speicherung der Ergebnisse**: Ergebnisse werden gespeichert (als MAT‑Dateien,
 %    Tabellen, Plots, etc.)
 
@@ -79,6 +87,7 @@
 % Hier siehst du ein Beispiel für die Grundstruktur eines Analyse‑Skripts:
 
 % 1. Konfiguration / Parameter
+
 projekt_name = "EEG_Blockkurs";
 subjekte     = 2:4;   % Beispiel: VP 2–4
 bedingungen  = ["kongruent","inkongruent"];

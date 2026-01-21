@@ -3,35 +3,36 @@
 % eine MATLAB‑Toolbox für die Analyse von EEG‑Daten.
 %
 % Inhalte:
-% 0. Einführung
-% 1. Überblick: Was ist EEGLAB?
-%    1.1 Die EEG‑Struktur
-% 2. Daten laden und inspizieren
-%    2.1 Grundlegende Informationen anzeigen
-%    2.1.1 Mehrere Dateien auflisten und laden
-%    2.2 Rohsignal visualisieren mit eegplot
-%    2.3 Einzelne Kanäle plotten
-%    2.4 Kanalpositionen visualisieren mit pop_chanedit
-%    2.4.1 Kanäle nach Namen finden
-%    2.5 Topographien plotten mit topoplot
-%    2.5.1 topoplot-Optionen
-% 3. Ereignisse und Epochen
-%    3.1 Events inspizieren
-%    3.1.1 Events filtern und finden
-%    3.2 Epochen definieren mit pop_epoch
-%    3.3 Baseline‑Korrektur mit pop_rmbase
-% 4. Grundlagen der Vorverarbeitung
-%    4.1 Re‑Referenzierung mit reref
-%    4.2 Filtern mit pop_eegfiltnew
-%    4.3 Daten ausschneiden mit pop_select
-% 5. Einfache ERPs
-%    5.1 ERP berechnen
-%    5.2 ERP plotten
-%    5.3 Vergleich zwischen Bedingungen
-%    5.4 Zeitpunkte finden
-%    5.5 Topographien für ERPs
-%    5.6 Grand Average berechnen
-%    5.7 Plot‑Formatierung für Publikationen
+% 
+% - 0. Einführung
+% - 1. Überblick: Was ist EEGLAB?
+%   - 1.1 Die EEG‑Struktur
+% - 2. Daten laden und inspizieren
+%   - 2.1 Grundlegende Informationen anzeigen
+%     - 2.1.1 Mehrere Dateien auflisten und laden
+%   - 2.2 Rohsignal visualisieren mit eegplot
+%   - 2.3 Einzelne Kanäle plotten
+%   - 2.4 Kanalpositionen visualisieren mit pop_chanedit
+%     - 2.4.1 Kanäle nach Namen finden
+%   - 2.5 Topographien plotten mit topoplot
+%     - 2.5.1 topoplot-Optionen
+% - 3. Ereignisse und Epochen
+%   - 3.1 Events inspizieren
+%     - 3.1.1 Events filtern und finden
+%   - 3.2 Epochen definieren mit pop_epoch
+%   - 3.3 Baseline‑Korrektur mit pop_rmbase
+% - 4. Grundlagen der Vorverarbeitung
+%   - 4.1 Re‑Referenzierung mit reref
+%   - 4.2 Filtern mit pop_eegfiltnew
+%   - 4.3 Daten ausschneiden mit pop_select
+% - 5. Einfache ERPs
+%   - 5.1 ERP berechnen
+%   - 5.2 ERP plotten
+%   - 5.3 Vergleich zwischen Bedingungen
+%   - 5.4 Zeitpunkte finden
+%   - 5.5 Topographien für ERPs
+%   - 5.6 Grand Average berechnen
+%   - 5.7 Plot‑Formatierung für Publikationen
 
 %% 0. Einführung
 % In diesem Tutorial lernst du, wie du mit EEGLAB arbeitest, einer

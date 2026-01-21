@@ -4,32 +4,33 @@
 % Programmen (z.B. R, Python) als auch für Publikationen.
 %
 % Inhalte:
-% 0. Einführung
-% 1. Tabellen als CSV/TXT exportieren
-%    1.1 Tabellen als CSV speichern
-%    1.2 Tabellen als TXT speichern
-%    1.3 Tabellen mit zusätzlichen Optionen speichern
-% 2. Plots speichern
-%    2.1 Plots als PNG speichern
-%    2.2 Hochauflösende Plots für Publikationen
-%    2.3 Plots als PDF speichern
-%    2.4 Plots mit spezifischen Dimensionen speichern
-%    2.5 Mehrere Plots speichern
-% 3. Daten als MAT‑Dateien speichern
-%    3.1 Einfaches Speichern
-%    3.2 Strukturen speichern
-%    3.3 Komprimiertes Speichern (v7.3 Format)
-% 4. BIDS‑Format: Struktur für organisierte Datenspeicherung
-%    4.1 Was ist BIDS?
-%    4.2 Warum BIDS verwenden?
-%    4.3 Einfache BIDS‑ähnliche Struktur erstellen
-%    4.4 Dateien nach BIDS‑Konvention benennen
-%    4.5 Metadaten in JSON speichern
-%    4.6 participants.tsv erstellen
-% 5. Best Practices für Datenspeicherung
-%    5.1 Organisierte Ordnerstruktur
-%    5.2 Konsistente Dateinamen
-%    5.3 Dokumentation
+% 
+% - 0. Einführung
+% - 1. Tabellen als CSV/TXT exportieren
+%   - 1.1 Tabellen als CSV speichern
+%   - 1.2 Tabellen als TXT speichern
+%   - 1.3 Tabellen mit zusätzlichen Optionen speichern
+% - 2. Plots speichern
+%   - 2.1 Plots als PNG speichern
+%   - 2.2 Hochauflösende Plots für Publikationen
+%   - 2.3 Plots als PDF speichern
+%   - 2.4 Plots mit spezifischen Dimensionen speichern
+%   - 2.5 Mehrere Plots speichern
+% - 3. Daten als MAT‑Dateien speichern
+%   - 3.1 Einfaches Speichern
+%   - 3.2 Strukturen speichern
+%   - 3.3 Komprimiertes Speichern (v7.3 Format)
+% - 4. BIDS‑Format: Struktur für organisierte Datenspeicherung
+%   - 4.1 Was ist BIDS?
+%   - 4.2 Warum BIDS verwenden?
+%   - 4.3 Einfache BIDS‑ähnliche Struktur erstellen
+%   - 4.4 Dateien nach BIDS‑Konvention benennen
+%   - 4.5 Metadaten in JSON speichern
+%   - 4.6 participants.tsv erstellen
+% - 5. Best Practices für Datenspeicherung
+%   - 5.1 Organisierte Ordnerstruktur
+%   - 5.2 Konsistente Dateinamen
+%   - 5.3 Dokumentation
 
 %% 0. Einführung
 % Nachdem du deine EEG‑Analysen durchgeführt hast, möchtest du die Ergebnisse

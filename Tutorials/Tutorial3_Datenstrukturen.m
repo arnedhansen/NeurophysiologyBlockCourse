@@ -3,24 +3,25 @@
 % wie sie später in der EEG‑Analyse nützlich sind.
 %
 % Inhalte:
-% 0. Einführung
-% 1. Warum Datenstrukturen wichtig sind
-% 2. Strukturen (struct)
-%    2.1 Einfache Strukturen erstellen
-%    2.2 Auf Felder zugreifen und ändern
-%    2.3 Verschachtelte Strukturen
-%    2.4 Beispiel: Mini‑EEG‑Struktur
-% 3. Zell‑Arrays (cell)
-%    3.1 Zell‑Arrays erstellen
-%    3.2 Zell‑Arrays in der EEG‑Analyse
-%    3.3 Zugriff auf Elemente: WICHTIGER UNTERSCHIED
-% 4. Tabellen (table) für Verhaltensdaten
-%    4.1 Tabellen erstellen
-%    4.2 Filtern und sortieren
-%    4.3 Tabellen mit weiteren Infos kombinieren
-% 5. Mix aus allem: kleine EEG‑Studie modellieren
-%    5.1 Schleife über alle Versuchspersonen
-%    5.2 Ergebnisse in einer Tabelle zusammenfassen
+% 
+% - 0. Einführung
+% - 1. Warum Datenstrukturen wichtig sind
+% - 2. Strukturen (struct)
+%   - 2.1 Einfache Strukturen erstellen
+%   - 2.2 Auf Felder zugreifen und ändern
+%   - 2.3 Verschachtelte Strukturen
+%   - 2.4 Beispiel: Mini‑EEG‑Struktur
+% - 3. Zell‑Arrays (cell)
+%   - 3.1 Zell‑Arrays erstellen
+%   - 3.2 Zell‑Arrays in der EEG‑Analyse
+%   - 3.3 Zugriff auf Elemente: WICHTIGER UNTERSCHIED
+% - 4. Tabellen (table) für Verhaltensdaten
+%   - 4.1 Tabellen erstellen
+%   - 4.2 Filtern und sortieren
+%   - 4.3 Tabellen mit weiteren Infos kombinieren
+% - 5. Mix aus allem: kleine EEG‑Studie modellieren
+%   - 5.1 Schleife über alle Versuchspersonen
+%   - 5.2 Ergebnisse in einer Tabelle zusammenfassen
 
 %% 0. Einführung
 % Bisher haben wir hauptsächlich mit einfachen Variablen gearbeitet: Zahlen,
