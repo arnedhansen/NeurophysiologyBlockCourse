@@ -127,7 +127,7 @@ These tutorials are available for interested students who want to deepen their k
 
 1. **German Live Scripts**: Open `.mlx` files directly in MATLAB. Click "Run" in the Live Editor tab to execute.
 
-2. **English Scripts**: Open `.m` files from `Tutorials/EN/` folder. You can run them section by section or convert them to Live Scripts in MATLAB.
+2. **English Scripts**: Open `.m` files from `Tutorials/EN/` folder. Convert them to Live Scripts for the correct formatting in MATLAB.
 
 ## Practice Materials
 
