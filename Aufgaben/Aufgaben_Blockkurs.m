@@ -90,7 +90,7 @@ disp(['Summe: ', num2str(summe)]);
 % Erstelle eine while-Loop, welche eine Zahl (Startwert:2) so lange wiederholt quadriert,
 % bis wir 10'000 oder höher erreichen.
 
-zahl= 2;
+zahl = 2;
 while
     
 end
@@ -106,7 +106,8 @@ figure; % Das öffnet hier eine leere Figur, sonst seht ihr nichts.
 plot() % Hier einfüllen
 
 %% (2.1 Sinuswellen)
-% Hier ist noch mal der Code zur Visualisierung einer Sinuswelle
+% Hier ist noch mal der Code zur Visualisierung einer Sinuswelle. Es muss
+% nichts geändert werden. Der Code dient als Template für die weiteren Aufgaben.
 t = 0:0.001:1; % Zeitvektor von 0 bis 1 Sekunde in Schritten von 1ms (0.001s)
 f = 5; % Frequenz der Sinuswelle in Hz
 A = 1; % Amplitude

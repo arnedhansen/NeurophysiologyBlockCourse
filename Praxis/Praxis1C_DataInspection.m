@@ -120,6 +120,7 @@ title('Data referenced to Nose')
 
 % Zweiter Plot, Daten zu Elektrode bei linkem Ohr rereferenzieren
 leftEarData=reref(EEG.data,chlLeftEar);
+% Reminder: Mittelwertsreferenz reref(EEG.data)
 
 subplot(2,2,2)
 topoplot(leftEarData(:,timePnt),EEG.chanlocs)
@@ -152,3 +153,72 @@ title('Data rereferenced to average')
 % "Hardcoding" ist nicht erlaubt :)
 
 %% FREIWILLIGE Hausaufgabe
+%
+% Die folgenden Aufgaben dienen dazu, die in dieser Praxis gelernten
+% Konzepte eigenständig zu vertiefen. Viel Erfolg!
+
+% -----------------------------------------------------------------------
+% Aufgabe 1: Einen anderen Datensatz laden und inspizieren
+% -----------------------------------------------------------------------
+% a) Lade einen anderen Datensatz aus dem Ordner 'data/preprocessed_data'.
+%    Tipp: Schau nach, welche Dateien dort verfügbar sind (z.B. mit "dir").
+%
+% b) Wie viele Kanäle und wie viele Datenpunkte hat dieser Datensatz?
+%    Nutze die Funktion "size" auf EEG.data und EEG.chanlocs.
+%
+% c) Wie hoch ist die Abtastrate (Sampling Rate)? Schaue in EEG.srate.
+
+% Dein Code hier:
+
+
+% -----------------------------------------------------------------------
+% Aufgabe 2: Zeitverlauf mehrerer Kanäle vergleichen
+% -----------------------------------------------------------------------
+% a) Wähle drei beliebige Kanäle aus und plotte deren Zeitverläufe
+%    für die Datenpunkte 1 bis 1000 in einer einzigen Abbildung.
+%    Verwende unterschiedliche Farben für jeden Kanal.
+%
+% b) Füge eine Legende hinzu, die die Kanalnamen anzeigt.
+%    Tipp: Die Kanalnamen findest du in EEG.chanlocs(kanal).labels
+%
+% c) Beschrifte die Achsen sinnvoll (x-Achse: Zeit in ms, y-Achse: uV).
+
+% Dein Code hier:
+
+
+% -----------------------------------------------------------------------
+% Aufgabe 3: Topographien zu verschiedenen Zeitpunkten
+% -----------------------------------------------------------------------
+% a) Erstelle eine Abbildung mit 4 Subplots (2x2), die jeweils eine
+%    Topographie zu einem anderen Zeitpunkt zeigen:
+%    - Datenpunkt 100
+%    - Datenpunkt 500
+%    - Datenpunkt 1000
+%    - Datenpunkt 2000
+%
+% b) Jeder Subplot soll einen Titel haben, der den Zeitpunkt in
+%    Millisekunden angibt (nicht den Datenpunkt!).
+%    Tipp: Nutze EEG.times, um den Datenpunkt in ms umzurechnen.
+%
+% c) Verwende die Mittelwertsreferenz für alle vier Topographien.
+
+% Dein Code hier:
+
+
+% -----------------------------------------------------------------------
+% Aufgabe 4: Einfluss der Rereferenzierung auf den Zeitverlauf
+% -----------------------------------------------------------------------
+% a) Wähle einen Kanal aus und plotte dessen Zeitverlauf (Datenpunkte
+%    1 bis 500) in vier verschiedenen Referenzierungen:
+%    - Original (Nasenreferenz)
+%    - Linkes Ohr (Elektrode 13)
+%    - Rechte Stirn (Elektrode 8)
+%    - Mittelwertsreferenz
+%
+% b) Nutze subplots (4x1), damit die Signale gut vergleichbar sind.
+%
+% c) Was fällt dir auf? Welche Unterschiede siehst du zwischen den
+%    verschiedenen Referenzierungen?
+
+% Dein Code hier:
+
