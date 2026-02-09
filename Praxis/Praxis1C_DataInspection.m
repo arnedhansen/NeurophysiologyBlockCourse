@@ -19,7 +19,7 @@ clc
 which hilbert 
 which gethmmalignment
 
-%Oder voller Überblick, inklusiver Version
+% Oder voller Überblick, inklusiver Version
 ver
 %% Pfade setzen
 
@@ -28,26 +28,25 @@ pathToData = 'data/preprocessed_data'
 
 % Pfad zu EEGlab
 addpath('eeglab2021.1')
-%Danach wird matlab EEGLab öffnen können, jedoch noch nicht alle Funktionen
-%wie Filter etc verwenden können.
+% Danach wird MATLAB EEGLab öffnen können, jedoch noch nicht alle
+% Funktionen (z.B. Filter) verwenden können
 
-% EEGlab öffnen und schliessen (damit werden alle wichtigen Funktionen zum
-% Pfad hinzugefügt)
+% EEGlab öffnen und schliessen
 eeglab;
 close;
+% Damit werden alle wichtigen Funktionen zum Pfad hinzugefügt
 
-%% EEG daten laden
+%% EEG-Daten laden
 load( [pathToData  '/gip_sub-002.mat'] );
 
-% Mit EEG Datenstrukutr vertraut machen
+% --> Mit EEG Datenstruktur vertraut machen
 
-% eeglab Funktion um die Positionen der Elektroden zu visualisieren
+% EEGLab-Funktion um die Positionen der Elektroden zu visualisieren
 pop_chanedit(EEG)
 
 %% Zeitverlauf der EEGd-Daten visualisieren
 
-
-%Erstens : EEGLab Fuktion verwenden um gesamtes Signal zu betrachten
+% Erstens : EEGLab Fuktion verwenden um gesamtes Signal zu betrachten
 % -----------------------------------------------------------------------
 eegplot(EEG.data)
 
