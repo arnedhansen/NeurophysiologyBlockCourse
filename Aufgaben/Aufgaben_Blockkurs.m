@@ -7,15 +7,17 @@
 % 
 % Schreibt euren Code direkt in die Felder unterhalb der Frage. Bitte 
 % stellt sicher, dass ihr alle Felder ausgefüllt habt, bevor ihr das Skript
-% an Arne (arne.hansen@psychologie.uzh.ch) sendet.
+% auf OLAT abgebt.
 %
 % Um den Code hier laufen zu lassen, könnt ihr entweder auf den grünen Pfeil
 % oben ('Run') drücken, oder in eine Aufgaben-Box klicken und oben 'Run
 % Section' klicken. Falls ihr diese Buttons nicht oben sehen könnt, müsst
 % ihr ganz oben in der blauen Leiste auf den Tab 'Editor' wechseln.
 
-% Ihr könnt dann im Workspace (ganz rechts)
-% kontrollieren, ob eure Variablen richtig abgespeichert sind.
+% Bitte ändert jetzt das Layout, falls es nicht bereits automatisch passiert
+% ist. Im Tab 'Home' auf 'Layout' und dann auf 'Three Columns (Default)' 
+% klicken. Ihr könnt dann im Workspace (ganz rechts) kontrollieren, ob eure 
+% Variablen richtig abgespeichert werden, wenn ihr Code ausführt.
 
 %% 1.1 Variablen
 % Erstelle eine Variable x und weise ihr den Wert 10 zu.
@@ -67,7 +69,7 @@ else
 end
 
 %% 1.6.2 for-Loops
-% Erstelle einen for-Loop, der in jeder Iteration (=Schlaufe) von 1:10 die 
+% Erstelle eine for-Loop, die in jeder Iteration (=Schlaufe) von 1:10 die 
 % aktuelle Schlaufenzahl (i) + 1 ausgibt.
 
 for i=1:10
@@ -83,6 +85,16 @@ for i=1:100
     summe = 
 end
 disp(['Summe: ', num2str(summe)]);
+
+%% 1.6.3 while-Loops
+% Erstelle eine while-Loop, welche eine Zahl (Startwert:2) so lange wiederholt quadriert,
+% bis wir 10'000 oder höher erreichen.
+
+zahl= 2;
+while
+    
+end
+ 
 
 %% 1.7 Plotten
 % Erstelle zwei beliebige Zahlenvektoren und visualisiere deren
