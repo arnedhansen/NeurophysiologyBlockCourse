@@ -82,7 +82,7 @@ end
 
 summe = 0;
 for i=1:100
-    summe = 
+    summe = 0
 end
 disp(['Summe: ', num2str(summe)]);
 
