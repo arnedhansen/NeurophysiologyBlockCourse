@@ -1,4 +1,4 @@
-%% Umsetzung und Auswertung von neurophysiologischen Experimenten FS25
+%% Umsetzung und Auswertung von neurophysiologischen Experimenten FS26
 %
 % Praxis V
 % Frequenz-Analysen und Zeit-Frequenz-Analysen

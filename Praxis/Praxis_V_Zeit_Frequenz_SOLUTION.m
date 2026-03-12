@@ -1,4 +1,4 @@
-%% Umsetzung und Auswertung von neurophysiologischen Experimenten FS25
+%% Umsetzung und Auswertung von neurophysiologischen Experimenten FS26
 %
 % Praxis V
 % Frequenz-Analysen und Zeit-Frequenz-Analysen
@@ -21,7 +21,7 @@ clc
 pathToData = 'data/preprocessed_data'; 
 
 % Pfad zu EEGlab
-addpath('eeglab2021.1')
+addpath('eeglab2025.1')
 % Danach wird MATLAB EEGLab öffnen können, jedoch noch nicht alle Funktionen
 % wie Filter etc verwenden können.
 
@@ -38,7 +38,7 @@ load([pathToData  '/gip_sub-002.mat']);
 % Erstmal machen wir das von Hand, etwas mühsam:
 channel = 60; % Wir schauen uns das Ganze erstmal für eine Elektrode an
 fft_res = abs(fft(EEG.data(channel,1:1000))); % 1000 Zeitpunkte = 4 Sekunden
-fft_res = fft_res(1:length(fft_res)/2); %%%%% negative FREQUENZEN
+fft_res = fft_res(1:length(fft_res)/2); %%%%% negative FREQUENZEN mirrored around Nyquist
 % Wir wählen abs(fft) für die Amplitude
 % FFT liefert auch Phaseninformation - diese interessiert uns aber meist nicht
 
@@ -266,7 +266,7 @@ plot(EEG_short.times(1:250),EEG_short.data(channel,1:250), 'LineWidth', 2);
 hold on;
 plot(EEG_short_filt.times(1:250),EEG_short_filt.data(channel,1:250), 'LineWidth', 2);
 yline(0)
-legend('Daten im Alpha-Frequenzband (8 - 13 Hz)', 'Hilbert-Tranformierte Alpha-Power')
+legend('Rohdaten', 'Daten im Alpha-Frequenzband (8 - 13 Hz)')
 ylabel('Amplitude [\muV^2]')
 xlabel('Zeit [ms]')
 set(gca, 'FontSize', 25)
