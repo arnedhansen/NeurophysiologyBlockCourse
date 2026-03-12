@@ -44,6 +44,8 @@ fft_res = fft_res(1:length(fft_res)/2); %%%%% negative FREQUENZEN
 
 figure;
 plot(fft_res)
+ylabel('Amplitude')
+xlabel('Welche Einheit?')
 % Schwierig zu erkennen, welche Frequenzen hier am stärksten ausgeprägt sind
 
 % Mit Vorkenntnissen aus dem Blockkurs können wir berechnen, um welche 
@@ -58,6 +60,8 @@ frequenzen = XXX:XXX:XXX; %%%%% 0.25:0.25:125
 figure;
 plot(frequenzen,fft_res);
 xline(125)
+ylabel('Amplitude')
+xlabel('Frequenzen [Hz]')
 % Warum gehen die Amplituden bei 40 Hz auf 0?
 
 %% EEGLab kann das auch, einfach, und gleichzeitg für alle Kanäle!
@@ -78,7 +82,7 @@ size(EEG.data)
 %   Log-Skalierung %%%%%% log10(0.0000000001)
 %   Andere Frequenzauflösung! Siehe freq
 length(frequenzen) % Frequenzen von 0.25 Hz bis 125 Hz in Schritten von 0.25 Hz
-length(freq)
+length(freq) % Frequenzen von 0 Hz bis 125 Hz in Schritten von 1 Hz
 
 % Warum sieht das sauberer aus? Trick wurde angewandt! Welch-Spektrum
 % Daten wurden in 4 Segmente von 1 Sekunde unterteilt, FFT über diese 
@@ -144,6 +148,8 @@ winSize2s = XXX; % XXX Zeitpunkte, die 4 ms auseinander liegen = 2 Sekunden %%%%
 % Berechnung Frequenzauflösung: 1/T [s]
 
 % STFT von Hand für die ersten 20 Sekunden
+spec_tf2 = [];
+freq_tf2 = [];
 for i = XXX:XXX %%%%% 1:10
     start = i * winSize2s;     % Wir starten bei Sekunde 2, nicht bei 0  %%%%% (500 Zeitpunkte * 4ms)
     stop  = start + winSize2s; % Wir enden 1 Window Size später (2s)
@@ -225,18 +231,17 @@ times(1:20) % Schritte von 10ms (wird automatisch definiert)
 %% Vergleiche Ergebnis der EEGLab STFT mit Wavelet-Analyse 
 
 % Anzahl an Zyklen für Wavelet-Analyse
-nCycles5 = 5; % Wavelets mit 5 Zyklen
+nCycles = 5; % Wavelets mit 5 Zyklen
 
 % Visualisierung der STFT
 figure;
-[erspWave,~,~,timesWave,freqsWave] = pop_newtimef(EEGC_all, 1, channel, [-400, 2600], nCycles5, 'freqs', [3 30],'plotphasesign','off','plotitc','off');
+[erspWave,~,~,timesWave,freqsWave] = pop_newtimef(EEGC_all, 1, channel, [-400, 2600], nCycles, 'freqs', [3 30],'plotphasesign','off','plotitc','off');
 % Man sieht: 
 %   Zeit teilweise abgeschnitten (Wavelets müssen ganz reinpassen!) 
 %   Datenlänge insgesamt 3s
 %   5 Zyklen
 %   niedrigste FOI = 3 Hz -> d.h. 3 Zyklen pro Sekunde -> 1 Zyklus = 1/3 s
 %   darum Länge des langsamstes Wavelets = 0.33 s * 5 Zyklen = 1.67 s
-%%%%%%       -> zeigen auf Slide Marius!
 
 % -> zeigen mit weniger Zyklen
 

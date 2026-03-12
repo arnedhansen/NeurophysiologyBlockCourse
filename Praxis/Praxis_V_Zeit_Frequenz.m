@@ -21,7 +21,7 @@ clc
 pathToData = 'data/preprocessed_data';
 
 % Pfad zu EEGlab
-addpath('eeglab2021.1')
+addpath('eeglab2025.1')
 % Danach wird MATLAB EEGLab öffnen können, jedoch noch nicht alle Funktionen
 % wie Filter etc verwenden können.
 
@@ -44,20 +44,24 @@ fft_res = fft_res(1:length(fft_res)/2); %%%%%
 
 figure;
 plot(fft_res)
+ylabel('Amplitude')
+xlabel('Welche Einheit?')
 % Schwierig zu erkennen, welche Frequenzen hier am stärksten ausgeprägt sind
 
 % Mit Vorkenntnissen aus dem Blockkurs können wir berechnen, um welche
 % Frequenzen es sich handelt:
 
 % Wir haben eine Abtastrate von 250 Hz und 4 Sekunden Daten
-% Kleinste schätzbare Frequenz = 0.25 Hz %%%%%
-% Frequenzauflösung = 0.25 Hz %%%%%
-% Grösste schätzbare Frequenz = 125 Hz %%%%%
+% Kleinste schätzbare Frequenz = ??? Hz %%%%%
+% Frequenzauflösung = ??? Hz %%%%%
+% Grösste schätzbare Frequenz = ??? Hz %%%%%
 
-frequenzen = 0.25:0.25:125; %%%%%
+frequenzen = XXX:XXX:XXX; %%%%%
 figure;
 plot(frequenzen,fft_res);
 xline(125)
+ylabel('Amplitude')
+xlabel('Frequenzen [Hz]')
 % Warum gehen die Amplituden bei 40 Hz auf 0?
 
 %% EEGLab kann das auch, einfach, und gleichzeitg für alle Kanäle!
@@ -78,7 +82,7 @@ size(EEG.data)
 %   Log-Skalierung %%%%%%
 %   Andere Frequenzauflösung! Siehe freq
 length(frequenzen) % Frequenzen von 0.25 Hz bis 125 Hz in Schritten von 0.25 Hz
-length(freq)
+length(freq) % Frequenzen von 0 Hz bis 125 Hz in Schritten von 1 Hz
 
 % Warum sieht das sauberer aus? Trick wurde angewandt! Welch-Spektrum
 % Daten wurden in 4 Segmente von 1 Sekunde unterteilt, FFT über diese
@@ -98,8 +102,6 @@ size(spec)     % 70 x 126
 % Was ist passiert? %%%%%
 % 126 Frequency bins
 % Freq 0 = Mittelwert des Signals über die Zeit (Baseline)
-
-% Visualisierung für Elektrode 60 für alle Frequenzen
 figure;
 plot(freq,spec(60,:))
 
@@ -113,11 +115,11 @@ winSize1s = 250; % 250 Zeitpunkte, die 4 ms auseinander liegen = 1 Sekunde
 
 % STFT von Hand für die ersten 20 Sekunden
 clc
-for i = 1:20
-    start = i * winSize1s;     % Wir starten bei Sekunde 1, nicht bei 0 -> 250 Zeitpunkte * 4ms
+for fensterNr = 1:20
+    start = fensterNr * winSize1s;     % Wir starten bei Sekunde 1, nicht bei 0 -> 250 Zeitpunkte * 4ms
     stop  = start + winSize1s; % Wir enden 1 Window Size später (1s)
-    [spec_tf(:,i),freq_tf] = spectopo(EEG.data(channel,start:stop), 0, EEG.srate,'plot','off','winsize', winSize1s);
-    disp(['Fenster Nr. ' num2str(i) ' = Zeitpunkt ' num2str(start), ' bis Zeitpunkt ', num2str(stop)])
+    [spec_tf(:,fensterNr),freq_tf] = spectopo(EEG.data(channel,start:stop), 0, EEG.srate,'plot','off','winsize', winSize1s);
+    disp(['Fenster Nr. ' num2str(fensterNr) ' = Zeitpunkt ' num2str(start), ' bis Zeitpunkt ', num2str(stop)])
 end
 
 % Ergebnis ansehen (diesmal nur von 2-30 Hz):
@@ -140,16 +142,16 @@ set(gca, 'FontSize', 25)
 % ABER: Segmente von 2 Sekunden
 
 % AUFGABE: Segmente von 2 Sekunden
-winSize2s = 500; % 500 Zeitpunkte, die 4 ms auseinander liegen = 2 Sekunden %%%%%
+winSize2s = XXX; % XXX Zeitpunkte, die 4 ms auseinander liegen = 2 Sekunden %%%%% 
 % Berechnung Frequenzauflösung: 1/T [s]
 
 % STFT von Hand für die ersten 20 Sekunden
 spec_tf2 = [];
 freq_tf2 = [];
-for i = 1:10 %%%%% 1:10
-    start = i * winSize2s;     % Wir starten bei Sekunde 2, nicht bei 0  %%%%%
+for fensterNr = XXX:XXX %%%%% 1:10
+    start = fensterNr * winSize2s;     % Wir starten bei Sekunde 2, nicht bei 0  %%%%% (500 Zeitpunkte * 4ms)
     stop  = start + winSize2s; % Wir enden 1 Window Size später (2s)
-    [spec_tf2(:,i),freq_tf2] = spectopo(EEG.data(channel,start:stop), 0, EEG.srate,'plot','off','winsize', winSize2s);
+    [spec_tf2(:,fensterNr),freq_tf2] = spectopo(EEG.data(channel,start:stop), 0, EEG.srate,'plot','off','winsize', winSize2s);
 end
 
 % Ergebnis ansehen:
@@ -176,10 +178,7 @@ set(gca,'YDir','normal')
 set(gca, 'FontSize', 25)
 
 % Mit längeren Segmenten:
-%   Frequenzauflösung ist besser geworden!
-%   ABER Zeitauflösung schlechter!
-%   Und: Für alle Frequenzen, die wir geschätzt haben ist die
-%   Auflösung genau dieselbe!
+%   XXX
 
 %% Man kann Zeit-Frequenz-Analysen von Hand programmieren, einfacher geht
 %  es aber auch hier mit vorprogammierten Funktionen aus EEGLab.
@@ -225,18 +224,17 @@ times(1:20) % Schritte von 10ms (wird automatisch definiert)
 %% Vergleiche Ergebnis der EEGLab STFT mit Wavelet-Analyse
 
 % Anzahl an Zyklen für Wavelet-Analyse
-nCycles5 = 3; % Wavelets mit 5 Zyklen
+nCycles = 5; % Wavelets mit 5 Zyklen
 
 % Visualisierung der Wavelet-Analyse
 figure;
-[erspWave,~,~,timesWave,freqsWave] = pop_newtimef(EEGC_all, 1, channel, [-400, 2600], nCycles5, 'freqs', [3 30],'plotphasesign','off','plotitc','off');
+[erspWave,~,~,timesWave,freqsWave] = pop_newtimef(EEGC_all, 1, channel, [-400, 2600], nCycles, 'freqs', [3 30],'plotphasesign','off','plotitc','off');
 % Man sieht:
 %   Zeit teilweise abgeschnitten (Wavelets müssen ganz reinpassen!)
 %   Datenlänge insgesamt 3s
 %   5 Zyklen
 %   niedrigste FOI = 3 Hz -> d.h. 3 Zyklen pro Sekunde -> 1 Zyklus = 1/3 s
 %   darum Länge des langsamstes Wavelets = 0.33 s * 5 Zyklen = 1.67 s
-%       -> zeigen auf Slide!
 
 % -> zeigen mit weniger Zyklen
 
