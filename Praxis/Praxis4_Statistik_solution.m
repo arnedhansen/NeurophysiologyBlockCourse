@@ -108,7 +108,6 @@ p2<correctedAlpha
 p3<correctedAlpha
 
 
-
 %%  1E) Besser als ANOVA: Gemischtes Lineares Modell:
 
 % Dafür Vorbereitung: Daten in Tabelle organisieren:

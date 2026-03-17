@@ -16,10 +16,10 @@ clc
 %% Pfade vorbereiten
 
 % Pfad zu den Daten
-pathToData='data/preprocessed_data'; 
+pathToData='data/preprocessed'; 
 
 % Pfad zu EEGlab
-addpath('eeglab2021.1')
+addpath('eeglab2025.1')
 %Danach wird matlab eeglab öffnen können, jedoch noch nicht alle Funktionen
 %wie Filter etc verwenden können.
 
@@ -31,14 +31,13 @@ close;
 %% interate over all subjects
 % list files in directory
 d = dir([pathToData, filesep, '*sub*']);
+
 d(1).name
 d(1).folder
 
-clear ERP1 ERP2 ERP3 ERP1_65 ERP2_65 ERP3_65
-for sub = 1 : 10
     
 % load EEG data
-load(fullfile(d(sub).folder, d(sub).name))
+load(fullfile(d(1).folder, d(1).name))
 
 % epoch
 % OUTEEG = pop_epoch( EEG, events, timelimits);
@@ -52,26 +51,28 @@ EEGC2 = pop_rmbase(EEGC2, [-200 0]);
 EEGC3 = pop_rmbase(EEGC3, [-200 0]);
 
 % compute average over trials
-ERP1(sub, :, :) = mean(EEGC1.data(:, :, :), 3);
-ERP2(sub, :, :) = mean(EEGC2.data(:, :, :), 3);
-ERP3(sub, :, :) = mean(EEGC3.data(:, :, :), 3);
+ERP1() = mean(EEGC1.data(:, :, :), 3);
+ERP2 = mean(EEGC2.data(:, :, :), 3);
+ERP3 = mean(EEGC3.data(:, :, :), 3);
 
 % find electrode 65
 i65 = find(ismember({EEGC1.chanlocs.labels}, 'EEG065'));
 
+EEGC1.data(61, :, :)
+
 % compute average over trials and select electrode 65
-ERP1_65(sub, :) = mean(EEGC1.data(i65, :, :), 3);
-ERP2_65(sub, :) = mean(EEGC2.data(i65, :, :), 3);
-ERP3_65(sub, :) = mean(EEGC3.data(i65, :, :), 3);
+ERP1_65 =mean(EEGC1.data(i65, :, :), 3);
+ERP2_65 =mean(EEGC2.data(i65, :, :), 3);
+ERP3_65 =mean(EEGC3.data(i65, :, :), 3);
 
-end
-%TODO: create a loop over all subjects and save subject averages to ERP1, ERP2,
-%ERP3 and data from electrode 65 to ERP1_65, ERP2_65, ERP3_65.
+%TODO: save data from electrode 65 to ERP1_65, ERP2_65, ERP3_65.
+%TODO: create a loop over all subjects and save all data
 
-%hint:
 
-% hint2
-% ERP1(xx, xx, ,xx)
+%% squeeze
+
+subject1 = squeeze(ERP1(1, : , :));
+
 %% Plotten
 % variability between subjects
 figure;
@@ -85,6 +86,7 @@ subplot(3, 1, 3)
 plot(EEGC1.times, ERP3_65)
 title('Scrambled')
 xlabel('Time (ms)')
+ylabel('Voltage')
 sgtitle('Variability between subjects across conditions')
 
 % grand average across conditions
@@ -96,11 +98,11 @@ GM3 = squeeze(mean(ERP3, 1));
 figure;
 plot(EEGC1.times, GM1(61, :), 'LineWidth', 1, 'Color', 'red') % try setting LineWidth to 2
 hold on
-plot(EEGC1.times, GM2(61, :), 'Color', 'blue')
+plot(EEGC1.times, GM2(61, :), 'LineWidth', 1, 'Color', 'blue')
 plot(EEGC1.times, GM3(61, :))
 xlabel('Time (ms)')
 ylabel('Voltage')
-set(gca, 'FontSize', 16)
+set(gca, 'FontSize', 20)
 set(gcf, 'Color', 'w')
 legend('familiar', 'unfamiliar', 'scrambled')
 
@@ -119,8 +121,8 @@ legend('familiar', 'unfamiliar', 'scrambled')
 figure; 
 topoplot([],EEGC1.chanlocs, 'style','blank','electrodes','labels'); % blank topo
 
-a = find(EEGC1.times == 152, 1) % find time points between 152ms 
-b = find(EEGC1.times == 212, 1) % and 212 ms (time window around N170 peak)
+a = find(EEGC1.times == 152) % find time points between 152ms 
+b = find(EEGC1.times == 212) % and 212 ms (time window around N170 peak)
 
 figure; 
 subplot(1, 3, 1)
@@ -136,8 +138,7 @@ topoplot(mean(GM3(:, a:b), 2),EEGC1.chanlocs,'electrodes','on'); % mean(GM1(:, a
 colorbar;
 % für extra punkte: colorbar zu red-white-blue ändern
 
-%TODO1: plot topography of GM2 and GM3 (1 figure, 3 subplots)
-%TODO2: plot topography of P300 for all 3 conditions
+%TODO1: plot topography of P300 for all 3 conditions
 
 %% shaded error bar
 figure;

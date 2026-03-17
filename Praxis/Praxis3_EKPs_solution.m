@@ -1,6 +1,5 @@
 %% Vorbereitung
 
-
 % Dieser code bewirkt, dass Matlab immer in den richtigen Ordner springt
 editorFile = matlab.desktop.editor.getActiveFilename;
 cd(fileparts(editorFile))
@@ -12,14 +11,13 @@ clear
 % Das "Command Window" leeren
 clc
 
-
 %% Pfade vorbereiten
 
 % Pfad zu den Daten
-pathToData='data/preprocessed_data'; 
+pathToData='data/preprocessed'; 
 
 % Pfad zu EEGlab
-addpath('eeglab2021.1')
+addpath('eeglab2025.1')
 %Danach wird matlab eeglab öffnen können, jedoch noch nicht alle Funktionen
 %wie Filter etc verwenden können.
 

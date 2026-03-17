@@ -20,7 +20,7 @@
 subjMeanERP = (ERP1_65 + ERP2_65 + ERP3_65) / 3;
 
 % Schritt B: Mittelwert über Versuchspersonen
-% (TODO)>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+% (TODO)
 GA = mean(subjMeanERP,1);
 
 %. ... und visualisieren:
@@ -35,7 +35,7 @@ plot(EEGC1.times, GA);
 
 % Wann (in ms) tritt der kleinste wert auf? (TODO)
 
-EEGC1.times(lat)
+EEGC3.times(lat)
 
 % Da das EEG Signal oft ein wenig verrauscht ist, mitteln wir ein paar
 % Samples / Datenpunkte um den Minimalwert:
@@ -54,11 +54,13 @@ xline(EEGC1.times(endLat));
 % Jetzt: Mittelwert um N170 (von startLat bis endLat) für jede 
 % Versuchsperson (und pro Bedingung) berechnen
 
+%startLat:endLat
+
 % TODO: XXX und YYY ersetzen
 for sub = 1:10
-    avgpeakC1(sub) = mean(  ERP1_65(sub,startLat:endLat) , 2);
-    avgpeakC2(sub) = mean(  ERP2_65(sub,startLat:endLat) , 2);
-    avgpeakC3(sub) = mean(  ERP3_65(sub,startLat:endLat) , 2);
+    avgpeakC1(sub) = mean(ERP1_65(sub,startLat:endLat), 2);
+    avgpeakC2(sub) = mean(ERP2_65(sub,startLat:endLat), 2);
+    avgpeakC3(sub) = mean(ERP3_65(sub,startLat:endLat), 2);
 end
 
 
@@ -92,7 +94,7 @@ disp(p3)
 
 % TODO: XXX durch korrekten Funktionsnamen ersetzen 
 
-[h,p2b,ci,stats] = ttest2(avgpeakC1,avgpeakC3); 
+[h,p2b,ci,stats] =ttest2(avgpeakC1,avgpeakC3); 
 disp(p2b)
 
 %% 1D) Bonferroni Korrektur:
@@ -103,7 +105,6 @@ correctedAlpha = alpha / numComparisons
 p1<correctedAlpha
 p2<correctedAlpha
 p3<correctedAlpha
-
 
 
 %% 1E) Besser als ANOVA: Gemischtes Lineares Modell:
@@ -118,7 +119,6 @@ tbl.subject=[1:10, 1:10, 1:10]';
 
 tbl.condition=categorical(tbl.condition);
 tbl.subject=categorical(tbl.subject);
-
 
 mdl=fitlme(tbl,'N170 ~ condition + (1|subject)')
 
@@ -178,17 +178,8 @@ comparison_all.pValue(2)
 
 nTimePoints=length(ERP1_65);
 
-for t=1:nTimePoints
-    
-    tbl2.ERP= double([ERP1_65(:,t); ERP2_65(:,t); ERP3_65(:,t)]);
+XXX;
 
-    % jetzt Modelle zum Zeitpunkt "t" fitten und Vergleichen:
-    mdl_full=fitlme(tbl2,'ERP ~ condition + (1|subject)');
-    mdl_small=fitlme(tbl2,'ERP ~ 1 + (1|subject)');
-    comparison_all=compare(mdl_small,mdl_full);
-    p_all(t)=comparison_all.pValue(2);
-
-end
 %% 2D) Visualisiere Zeitverlauf der unkorrigierten p werte:
 
 figure;

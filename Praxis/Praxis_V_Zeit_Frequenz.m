@@ -52,11 +52,11 @@ xlabel('Welche Einheit?')
 % Frequenzen es sich handelt:
 
 % Wir haben eine Abtastrate von 250 Hz und 4 Sekunden Daten
-% Kleinste schätzbare Frequenz = ??? Hz %%%%%
-% Frequenzauflösung = ??? Hz %%%%%
-% Grösste schätzbare Frequenz = ??? Hz %%%%%
+% Kleinste schätzbare Frequenz = 0.25 Hz %%%%%
+% Frequenzauflösung = 0.25 Hz %%%%%
+% Grösste schätzbare Frequenz = 125 Hz %%%%%
 
-frequenzen = XXX:XXX:XXX; %%%%%
+frequenzen = 0.25:0.25:125; %%%%%
 figure;
 plot(frequenzen,fft_res);
 xline(125)
@@ -142,13 +142,13 @@ set(gca, 'FontSize', 25)
 % ABER: Segmente von 2 Sekunden
 
 % AUFGABE: Segmente von 2 Sekunden
-winSize2s = XXX; % XXX Zeitpunkte, die 4 ms auseinander liegen = 2 Sekunden %%%%% 
+winSize2s = 500; % XXX Zeitpunkte, die 4 ms auseinander liegen = 2 Sekunden %%%%% 
 % Berechnung Frequenzauflösung: 1/T [s]
 
 % STFT von Hand für die ersten 20 Sekunden
 spec_tf2 = [];
 freq_tf2 = [];
-for fensterNr = XXX:XXX %%%%% 1:10
+for fensterNr = 1:10 %%%%% 1:10
     start = fensterNr * winSize2s;     % Wir starten bei Sekunde 2, nicht bei 0  %%%%% (500 Zeitpunkte * 4ms)
     stop  = start + winSize2s; % Wir enden 1 Window Size später (2s)
     [spec_tf2(:,fensterNr),freq_tf2] = spectopo(EEG.data(channel,start:stop), 0, EEG.srate,'plot','off','winsize', winSize2s);

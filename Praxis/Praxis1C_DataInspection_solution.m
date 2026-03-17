@@ -19,7 +19,7 @@ ver
 %% Pfade setzen
 
 % Pfad zu den Daten
-pathToData='data/preprocessed_data' 
+pathToData='data/preprocessed' 
 
 % Pfad zu EEGlab
 addpath('eeglab2021.1')
@@ -31,10 +31,11 @@ addpath('eeglab2021.1')
 eeglab;
 close;
 
-%% EEG daten laden
+%% EEG Daten laden
 load( [pathToData  '/gip_sub-002.mat'] );
 
-% Mit EEG Datenstrukutr vertraut machen
+% Mit EEG Datenstruktur vertraut machen
+% srate, data, times, chanlocs, event, ref
 
 % EEG.data - actual EEG data, after recording 2 dimension: Channel & time
 
@@ -50,7 +51,7 @@ load( [pathToData  '/gip_sub-002.mat'] );
 % eeglab Funktion um die Positionen der Elektroden zu visualisieren
 pop_chanedit(EEG)
 
-%% Zeitverlauf der EEGd-Daten visualisieren
+%% Zeitverlauf der EEG-Daten visualisieren
 
 
 %Erstens : EEGLab Fuktion verwenden um gesamtes Signal zu betrachten
@@ -77,7 +78,7 @@ nChannelB = 50;
 minPnt = 1;
 maxPnt = 500; %Wieviel Zeit vergeht von minPoint zu MaxPoint?
 
-%Die folgene Abbildung soll zuerst das EEG Signal von channelA, von
+%Die folgende Abbildung soll zuerst das EEG Signal von channelA, von
 %minPnt bis maxPnt plotten, und danach noch das EEG Signal von 
 % Auf der x-Achse soll die Zeit in ms aufgetragen werden, auf der y-Achse
 % die Ausprägung des EEG Signals
@@ -103,6 +104,7 @@ ylabel('signal [uV]')
 close all
 
 %% Topographien plotten & Rerefernzierung
+%Andere, wichtige Art EEG Daten zu betrachten!
 
 % Wir wählen einen arbiträren Datenpunkt (500).
 % Nach wievielen ms wurde dieser Datenpunkt aufgenommen? 

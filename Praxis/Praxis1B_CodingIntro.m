@@ -1,6 +1,6 @@
 %% Vorbereitung
-% 1) Daten Herunterladen
-% https://www.dropbox.com/sh/ldpm2mobd3y62eb/AACy_gw9Wbfrbmpji9rAMoura?dl=0
+% 1) Daten herunterladen
+% https://www.dropbox.com/scl/fo/2twzmm4qn8v1nf44m26xc/ACbqrADFhr8_7qvW__1Gu88?rlkey=cp6m85qndyqx6oheodk69m16d&st=a7uw9fij&dl=0
 % (sollte bereits erledigt sein)
 
 
@@ -9,64 +9,88 @@
 % Blockkurs Ordner
 % -> Unterordner "Theorie" (Foliensätze)
 % -> Unterordner: Praxis
-%   -> Praxis1B_CodingIntro.m
+%   -> Praxis1A_CodingIntro.m
 %   -> Unterordner: "eeglab2021.1" 
 %   -> Unterordner "data"  
 %       -> Unterodrner "raw" (Hier heruntergaldene Daten reinkopieren)
 %       -> Unterordner "preprocessed" (Hier heruntergaldene Daten reinkopieren)
 
-%% Matlab script vs- Matlab Live script
+%Teste, ob Ordnerstruktur korrekt ist:
+%A) Daten laden
+load('data/preprocessed/gip_sub-002.mat');
+%B) EEGlab starten
+addpath('eeglab2021.1')
+eeglab;
+
+% Wenn Ordnerstruktur stimmt, aber Daten / eeglab trotzdem nicht gefunden 
+% werden  - siehe nächster Punkt:
+
+%% Matlab Oberfläche
+% Links: "Files" -> Wo befindet sich das aktuelle "working directiory"
+%        --> Muss immer im "Praxis" Ordner des Blockkurses sein
+%        --> Wenn nicht der Fall, siehe Befehl in Praxis skritpen, oder 
+%            Rechtsklick auf den Tab oben (Skriptname) und "Change current
+%            folder to [...]"
+% Mitte: Oben: Editor
+%        Unten: Command Window
+% Rechts: Workspace (Welche Variablen/Daten habe ich erstellt bzw. geladen)
+
+%% Matlab script vs. Matlab Live script
 % 1) Output erscheint auf Konsole
 % 2) Es gibt nur noch Code, für regulären Text muss man Kommentare verwenden
-% 3) Figures: In Live script erscheinen sie automatisch rechts, hier müssen
+% 3) Figures: In Live Script erscheinen sie automatisch rechts, hier müssen
 % wir zuerst leere figure öffnen (öffnet in neuem Fenster)
+% (Wenn wir es nicht tun, wird die zuletzt erzeugte Grafik überschrieben)
 % 3) Es können Teile des Codes ausgeführt weden, auch wenn andere noch
 % fehlerhaft sind
 %   3a) Code markieren - Rechtsklick - Evaluate selection (siehe
 %   Tastenkombination)
 %   3b) Sections bilden
 
-% Umfrage: Wie kompliziert war Umstieg von Tutorial (Live Script) zu Aufgabe
-% (Script)
+% Umfrage: Wie kompliziert/verwirrend war Umstieg von Tutorial (Live Script) 
+% zu Aufgabe (Script)
 
 %% Hello world
-disp('Hello world')
+clear all; %Workspace leeren (EEG Daten brauchen wir vorerst noch nicht)
+disp('Hello world') 
 
 %% Operatoren
 
 %arithmetisch
 2+3
 2*3
-2/3
 
 %logisch:
 1>2
-1<=1
-
-1==2
 2==2
+
 
 %Neu: logische Operatoren können kombiniert werden
 
 %Logisches UND
-1<2 & (3+2)<4
+(1<2) & (5<4)
 
+%Beispiel aus dem visuellen Arbeitsgedächtnisparadigma:
 
-%Beispiel aus dem Visuellen Arbeitsgedächtnisparadigma:
-% wir wollen aktuelles Datensegment nur analysieren, wenn das EEG keine
-% Artefakte anzeigt UND der Eyetracker keine Augenbewegungen während des
-% Versuchsdurchgangs registriert hat
+% Wir wollen aktuelles Datensegment nur analysieren, wenn das EEG keine
+% Artefakte anzeigt (bedingungA) UND der Eyetracker keine Augenbewegungen 
+% während des Versuchsdurchgangs registriert hat (bedingungB)
 
-%Logisches ODER
-bedingungA= 1<2 
-bedingungB= (3+2)<4
-bedingungA | bedingungB % Trifft eine davon zu?
+bedingungA= true; % = logical(1); EEG sagt: Daten sind sauber (keine Artefakte)
+bedingungB= false; % = logical(0); Eye tracker sagt: Augen waren aber geschlossen! 
+
 bedingungA & bedingungB % Treffen beide Bedingungen zu?
 
 
-%Beispiel aus dem Visuellen Arbeitsgedächtnisparadigma:
-% wir wollen aktuelles Datensegment analysieren wenn dabei zwei ODER vier
-% Stimuli präsentiert wurden
+%Logisches ODER
+
+%Beispiel aus dem visuellen Arbeitsgedächtnisparadigma:
+% wir wollen aktuelles Datensegment analysieren wenn wir entweder in
+% Versuchsbedinung A (zwei präsentierte Stimuli) ODER in B (vier
+% präsentiere Stimuli) sind
+
+
+bedingungA | bedingungB  % Trifft eine davon zu?
 
 
 %% Variablen
@@ -79,10 +103,10 @@ meineVar4= 'Acht';
 
 %% Arrays (= Vektoren) 
 
-meinArray=[3, 4, 5];
+meinArray=[3, 4, 5]; 
 meinArray(2)
 
-meineVar4(2) %War in Wirklichkeit auch ein array, an jedem eintrag steht ein Buchstabe
+meineVar4(2) %War in Wirklichkeit auch ein array, an jedem Eintrag steht ein Buchstabe
 
 %% Inahlte von Variablen verbinden ("concatenate")
 a='Hello';
@@ -98,20 +122,20 @@ c=[b, num2str(x1)]; % Eckige klammern verbinden zahlen und zeichenketten
 disp(c) 
 
 
-
 %% Matrizen
 
 x3=[1, 2, 3];
 x4=[4, 5, 6];
 
-%zuerst: zu Array verbinden  (horizontal)
+%zuerst: zu Array verbinden  (horizontal, mittels Komma)
 array34=[x3,x4]
 
-%zu Matrix verbinden (vertikal)
+%zu Matrix verbinden (vertikal, mittel Semikolon)
 matrix34=[x3;x4]
 
 %Versuche auf die Zahl 6 in matrix34 zuzugreifen: matrix(zeile,spalte)
-matrix34( 2 , 3)
+matrix34(2,3)
+
 
 %% Funktionen / Methoden
 % ..sind vorprogrammierter Code der gewisse Aufgaben (Funktionen) für uns
@@ -154,6 +178,9 @@ x6=[x1,x3]
 c_wrong(1)=1;
 c_wrong(2)='Hello';
 
+[1 'Hello']
+{1, 'Hello'}
+
 c_cell{1}=1;
 c_cell{2}='Hello';
 
@@ -169,16 +196,19 @@ for i=1:10
 end
 
 
-meineVar=1;
+% Eine schleife die 2^10 schrittweise berechnet und uns immer den
+% zwischenstand ausgibt
+
+meineVar=2;
 for i=1:1:10 
 % wenn man 1:10 schreibt, geschieht eigentlich das. Man könnte auch andere
 % Schrittgrössen wählen, zb i=1:2:10
-
     disp(['Aktueller wert von i: ' num2str(i) ', aktueller Wert von meineVar: ' num2str(meineVar)]) 
-    
     %variable jedes mal mit 2 multiplizieren
     meineVar=meineVar*2;
+
 end
+
 
 
 
@@ -211,20 +241,25 @@ zahlen=[3, 4, 7, 1, 6, 10, 11, 13, 14];
 summe=0;
 
 % Aufgabe:
-% Schleife bilden die über das Array "zahlen" geht, und dabei die ungeraden 
+% Schleife bilden die über das Array "zahlen" geht, und dabei die geraden 
 % Zalen aufaddiert. Danach soll das ergbnis ausgegeben werden
 
-anzZahlen=length(zahlen);
+%length(zahlen)  --> length() sagt uns wieviele werte in einem Array
+%gespeichert sind
 
-for i = 1:anzZahlen
-    rest=mod(zahlen(i),2); % Welcher Rest bleibt übrig wenn wir die 
-                           % aktuelle Zahlt durch 2 teilen
-    if  rest==1
-        %Aktuelle Zahl aus dem Vektor/Array "zahlen" auslesen und zu
-        %"summe" addieren
+%LLMs: 
+
+% Guter Promp: "Wie kann ich in Matlab feststellen on eine Zahl gerade ist? 
+% Erkläre mir die Lösung."
+
+% Schlechter Prompt: "Bilde eine Schleife, die über das Array "zahlen" geht,
+% und dabei die geraden Zalen aufaddiert. 
+% Danach soll das ergbnis ausgegeben werden."
+
+for i = 1:length(zahlen)
+    if mod(zahlen(i),2)==0
         summe=summe+zahlen(i);
-        
     end
 end
 
-disp(['Die Summe der ungeraden zahlen lautet: ' num2str(summe)])
+disp(['Die Summe der geraden zahlen lautet: ' num2str(summe)])

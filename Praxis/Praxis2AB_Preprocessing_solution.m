@@ -16,11 +16,10 @@ clc
 %% Pfade vorbereiten
 
 % Pfad zu den Daten, diesmal die Rohdaten!
-pathToData='data/raw_data'; 
+pathToData='data/raw'; 
 
 % Pfad zu EEGlab
-addpath('eeglab2021.1')
-addpath('/Users/Arne/Dropbox/AA_Teaching/Blockkurs_Auswertung_neurophysiologische_Experimente/FS_2025/Praxis/eeglab2021.1')
+addpath('eeglab2025.1')
 %Danach wird matlab eeglab öffnen können, jedoch noch nicht alle Funktionen
 %wie Filter etc verwenden können.
 
@@ -30,7 +29,7 @@ eeglab;
 close;
 
 % Ausserdem: Vollen Pfad der "Clean_Rawdata" toolbox hinzufügen.
-CRDpath='eeglab2021.1/plugins/clean_rawdata2.6';
+CRDpath='eeglab2025.1/plugins/clean_rawdata';
 addpath(genpath(CRDpath));
 
 %% Daten Laden
@@ -49,6 +48,9 @@ EEG = pop_select( EEG,'time',[1, 121] );
 eegplot(EEG.data,'events',EEG.event)
 % Beim durchscrollen können wir Rauschen im Kanal 67 sehen
 % Ausserdem treten grosse Artefakte auf
+% Obwohl Daten "raw" heissen, muessen sie schon zumindest minimal
+% vorverarbeitet sein, warum? Was wurde angewandt?
+% --> Keine drifts, linien sind gerade, high pass filter
 
 % Events?: 
 % Springe zu Seite 20
@@ -74,13 +76,21 @@ xlabel('Time (ms)');
 
 
 %Topographie betrachten:
+plotSample=180;
+
+figure;
+topoplot(EEG.data(:,plotSample),EEG.chanlocs,'electrodes','on');
+title('Raw data');colorbar;
+
+
+%Weitere Topographie betrachten:
 plotSample=1000;
 
 figure;
 topoplot(EEG.data(:,plotSample),EEG.chanlocs,'electrodes','on');
 title('Raw data');colorbar;
-% Bei sauberen EEG Daten sollten Positive udn negative Werte in etwa im
-% Gleichgewicht sein (Alle generatoren haben + und - pol)
+% Auffallend hier: Bei sauberen EEG Daten sollten positive und negative 
+% Werte in etwa im Gleichgewicht sein (Alle generatoren haben + und - pol)
 
 % Wir behalten also diese Abbildung also für später offen!
 
@@ -103,6 +113,8 @@ params.WindowCriterion ='off';
 % double check, haben wir die funktion korrekt zum Pfad hinzugefügt?
 which clean_artifacts
 EEG_CRD=clean_artifacts(EEG,params);
+%Wichtig (immer): wir MUESSEN das Ergebnis in eine Variable abspeichern
+
 % Schauen wir das Ergebnis an - Dimensionen der Daten sind nun 57 X 30001 
 % So viel wollten wir garnicht, wir wollen erstmal nur wissen welches die
 % verrauschten Elektroden sind
@@ -110,9 +122,12 @@ EEG_CRD=clean_artifacts(EEG,params);
 % ... diese Information ist etwas versteckt
 CRD_goodChannels = EEG_CRD.etc.clean_channel_mask;
 badChannels = find(not(CRD_goodChannels)); %find() funktion ist sehr wichtig!
+%find([0 0 0 1 0 1])
 
-%TDOD: run "eeg_interp" function
-% Interpoliere Verrauschte ELektroden, benutze die 'spherical' Methode
+%TODO: "eeg_interp" Funktion benutzen!
+% Interpoliere Verrauschte ELektroden, benutze die 'spherical' Methode.
+% Wir wollen keine bestimmte time range (t_range) setzen (d.h. wir lassen
+% t_range weg)
 EEG=eeg_interp(EEG, badChannels, 'spherical');
 
 
@@ -148,9 +163,6 @@ figure;
 topoplot(EEG.data(:,plotSample),EEG.chanlocs,'electrodes','on');colorbar;
 title('Highpass Filtered data');
 
-
-
-
 % Low-pass Filter (40 Hz)
 %TODO: Verwende "pop_eegfiltnew"
 EEG_filt=pop_eegfiltnew(EEG,[],40);
@@ -161,14 +173,14 @@ plot(EEG_orig.times(minPnt:maxPnt), EEG_orig.data(selectChan,minPnt:maxPnt));
 hold on;
 plot(EEG.times(minPnt:maxPnt), EEG.data(selectChan,minPnt:maxPnt));
 
-plot(EEG_filt.times(minPnt:maxPnt), EEG_filt.data(selectChan,minPnt:maxPnt),'k');
+plot(EEG_filt.times(minPnt:maxPnt), EEG_filt.data(selectChan,minPnt:maxPnt),'color','k'); % or 'color',[0 0 0]
 
 legend({'raw', 'highpass filtered','high & lowpass filtered'});
 
-%TODO: die neu teif(&hoch)-pass gefilterten daten hinzufügen (idealerweise in schwarz)
+%TODO: die neu tief-pass gefilterten daten hinzufügen (idealerweise in schwarz)
 %TODO:  Legende ergänzen
-%Hinweis: wir müssen "hold on" nur einmal aktivieren um auch mehrere linien
-%zum selben plot hinzuzufügen
+%Hinweis: wir müssen "hold on" nur einmal aktivieren um auch mehrere Linien
+%zum selben Plot hinzuzufügen
 
 %Von jetzt an nur noch die hoch-& tief-pass gefiltereren Daten verwenden
 EEG=EEG_filt;
@@ -179,16 +191,18 @@ EEG=EEG_filt;
 
 %% ICA
 
-% run ICA
-
-%TODO run ICA, use 100 steps for now
+% ICA durchführen:
+% Um es zu beschleunigen erlauben wir nur 100 Schritte / Iterationen
 EEG=pop_runica(EEG,'maxsteps',100);
 
 
-% Look at results in Datastruct: 
-% EEG.icawinv, EEG.icaact 
+% EEG Struktur öffnen, enthält nun neue Felder: 
+% EEG.icawinv, EEG.icaact, ...
+
 % Dimension winv = 70*56
-%What do these dimensions mean?
+%Was bedeuten diese dimensionen? Erinnerung, ICA kann nur so viele
+%komponenten finden wie es "Mikrophone" gab.
+
 %Tipp:
 rank(EEG.data)
 % Rang einer Matrix = Anzahl linear unabhängiger Zeilenv.
@@ -233,7 +247,7 @@ legend('Before ICA', 'After ICA')
 
 %gesamtes IClabel paket zum pfad hinzufügen, sodass wir alle Funktionen
 %verwenden können:
-addpath(genpath(['eeglab2021.1' filesep 'plugins/ICLabel']))
+addpath(genpath(['eeglab2025.1' filesep 'plugins/ICLabel']))
 
 %IClabel klassifizieren lassen:
 EEG_ICL = iclabel(EEG); 
@@ -265,6 +279,3 @@ eegplot(EEG_orig.data ,'data2', EEG_ica_V2.data)
 
 minDatalengthICA=20*EEG.nbchan^2
 length(EEG.data)
-
-
-

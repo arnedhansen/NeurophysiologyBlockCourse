@@ -16,10 +16,10 @@ clc
 %% Pfade vorbereiten
 
 % Pfad zu den Daten, diesmal die Rohdaten!
-pathToData='data/raw_data'; 
+pathToData='data/raw'; 
 
 % Pfad zu EEGlab
-addpath('eeglab2021.1')
+addpath('eeglab2025.1')
 %Danach wird matlab eeglab öffnen können, jedoch noch nicht alle Funktionen
 %wie Filter etc verwenden können.
 
@@ -29,7 +29,7 @@ eeglab;
 close;
 
 % Ausserdem: Vollen Pfad der "Clean_Rawdata" toolbox hinzufügen.
-CRDpath='eeglab2021.1/plugins/clean_rawdata2.6';
+CRDpath='eeglab2025.1/plugins/clean_rawdata';
 addpath(genpath(CRDpath));
 
 %% Daten Laden
@@ -48,6 +48,8 @@ EEG = pop_select( EEG,'time',[1, 121] );
 eegplot(EEG.data,'events',EEG.event)
 % Beim durchscrollen können wir Rauschen im Kanal 67 sehen
 % Ausserdem treten grosse Artefakte auf
+% Obwohl Daten "raw" heissen, muessen sie schon zumindest minimal
+% vorverarbeitet sein, warum? Was wurde angewandt?
 
 % Events?: 
 % Springe zu Seite 20
@@ -57,29 +59,36 @@ eegplot(EEG.data,'events',EEG.event)
 %TODO: Korrekte werte für minPnt und MaxPnt einsetzen
 
 channel=10;
-minPnt= 1 ; %first sample
-maxPnt= 251 ; %sample at 1000 ms
+minPnt= 1; %first sample
+maxPnt= 250; %sample at 1000 ms
 
 figure;
 subplot(2,1,1)
 plot(EEG.data(channel,minPnt:maxPnt));
 xlabel('Sample');
-%TODO: Verbessere lesbarkeit in zweitem Plot indem die korrekte Zeit auf 
+%TODO: Verbessere Lesbarkeit in zweitem Plot, indem die korrekte Zeit auf 
 % die X-achse geplotted wird
 subplot(2,1,2)
-plot( EEG.times(minPnt:maxPnt) ,EEG.data(channel,minPnt:maxPnt));
-xlabel('Time (ms)');
-
-
+%...
+plot(EEG.times(minPnt:maxPnt),EEG.data(channel,minPnt:maxPnt));
+xlabel('Time');
 
 %Topographie betrachten:
+plotSample=180;
+
+figure;
+topoplot(EEG.data(:,plotSample),EEG.chanlocs,'electrodes','on');
+title('Raw data');colorbar;
+
+
+%Andere, zufällige Topographie betrachten (kein Augenartefakt):
 plotSample=1000;
 
 figure;
 topoplot(EEG.data(:,plotSample),EEG.chanlocs,'electrodes','on');
 title('Raw data');colorbar;
-% Bei sauberen EEG Daten sollten Positive udn negative Werte in etwa im
-% Gleichgewicht sein (Alle generatoren haben + und - pol)
+% Auffallend hier: Bei sauberen EEG Daten sollten positive und negative 
+% Werte in etwa im Gleichgewicht sein (Alle generatoren haben + und - pol)
 
 % Wir behalten also diese Abbildung also für später offen!
 
@@ -102,6 +111,8 @@ params.WindowCriterion ='off';
 % double check, haben wir die funktion korrekt zum Pfad hinzugefügt?
 which clean_artifacts
 EEG_CRD=clean_artifacts(EEG,params);
+%Wichtig (immer): wir MUESSEN das Ergebnis in eine Variable abspeichern
+
 % Schauen wir das Ergebnis an - Dimensionen der Daten sind nun 57 X 30001 
 % So viel wollten wir garnicht, wir wollen erstmal nur wissen welches die
 % verrauschten Elektroden sind
@@ -109,11 +120,15 @@ EEG_CRD=clean_artifacts(EEG,params);
 % ... diese Information ist etwas versteckt
 CRD_goodChannels = EEG_CRD.etc.clean_channel_mask;
 badChannels = find(not(CRD_goodChannels)); %find() funktion ist sehr wichtig!
+%find([0 0 0 1 0 1])
 
 %TODO: "eeg_interp" Funktion benutzen!
-% Interpoliere Verrauschte ELektroden, benutze die 'spherical' Methode
-EEG = eeg_interp(EEG, badChannels, 'spherical');
+% Interpoliere Verrauschte Elektroden, benutze die 'spherical' Methode.
+% Wir wollen keine bestimmte time range (t_range) setzen (d.h. wir lassen
+% "t_range" weg)
+help eeg_interp
 
+EEG= eeg_interp(EEG,badChannels, 'spherical');
 %Jetzt können wir Daten rereferenzierem - 
 % -- Warum wäre das vor diesem Schritt eine schelchte Idee gewesen?
 
@@ -129,9 +144,7 @@ EEG.data=reref(EEG.data);
 EEG_orig=EEG;
 
 % High-pass Filter (1 Hz):
-%TODO: EEG Daten mit der Funktion "pop_eegfiltnew" filtern
 EEG = pop_eegfiltnew(EEG, 1, []);
-
 
 % Signal vor und nach Filter plotten:
 selectChan=10;
@@ -143,34 +156,30 @@ hold on;
 plot(EEG.times(minPnt:maxPnt), EEG.data(selectChan,minPnt:maxPnt));
 legend({'raw', 'highpass filtered'});
 
-% plot topograpy of of same timpoint again
+% plot topograpy of of same timepoint again
 figure;
 topoplot(EEG.data(:,plotSample),EEG.chanlocs,'electrodes','on');colorbar;
 title('Highpass Filtered data');
 
 
 % Low-pass Filter (40 Hz) auf die "EEG" Daten
-%TODO: Verwende "pop_eegfiltnew"
-
-EEGfilt = pop_eegfiltnew(EEG,[] ,40 );
+%TODO: Verwende "pop_eegfiltnew", speichere das ergebnis in "EEG_filt"
+EEG_filt=pop_eegfiltnew(EEG,[],40);
 
 %Selber Plot nochmal, alle Versionen vergleichen:
 figure;
 plot(EEG_orig.times(minPnt:maxPnt), EEG_orig.data(selectChan,minPnt:maxPnt));
 hold on;
 plot(EEG.times(minPnt:maxPnt), EEG.data(selectChan,minPnt:maxPnt));
-plot(EEGfilt.times(minPnt:maxPnt), EEGfilt.data(selectChan,minPnt:maxPnt),'k');
-
-
-legend({'raw', 'highpass filtered', 'Low and high pass'});
-
-%TODO: die neu tief(&hoch)-pass gefilterten daten hinzufügen (idealerweise in schwarz)
+plot(EEG_filt.times(minPnt:maxPnt),EEG_filt.data(selectChan,minPnt:maxPnt),'color','black');
+legend({'raw', 'highpass filtered',' high and lowpass filtered'});
+%TODO: die neu tief-pass gefilterten daten hinzufügen (idealerweise in schwarz)
 %TODO:  Legende ergänzen
-%Hinweis: wir müssen "hold on" nur einmal aktivieren um auch mehrere linien
-%zum selben plot hinzuzufügen
+%Hinweis: wir müssen "hold on" nur einmal aktivieren um auch mehrere Linien
+%zum selben Plot hinzuzufügen
 
 %Von jetzt an nur noch die hoch-& tief-pass gefiltereren Daten verwenden
-%EEG=EEGfilt;
+EEG=EEG_filt;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -182,38 +191,50 @@ legend({'raw', 'highpass filtered', 'Low and high pass'});
 % Um es zu beschleunigen erlauben wir nur 100 Schritte / Iterationen
 EEG=pop_runica(EEG,'maxsteps',100);
 
-
 % EEG Struktur öffnen, enthält nun neue Felder: 
 % EEG.icawinv, EEG.icaact, ...
 
+% Dimension winv = 70*56
+%Was bedeuten diese dimensionen? Erinnerung, ICA kann nur so viele
+%komponenten finden wie es "Mikrophone" gab.
+%(Siehe Folien zu winv)
+
+%Tipp:
+rank(EEG.data)
+% Rang einer Matrix = Anzahl linear unabhängiger Zeilen.
+% Warum gibt es 56 unabhängige komponenten bei 70 Elektroden?
 
 % ICA Ergebnisse visualisieren
-%TODO, Komponenten 1 bis 30 visualisieren lassen, mittels "pop_selectcomps"
-pop_selectcomps(EEG,1:30)
-
+% TODO, Komponenten 1 bis 30 visualisieren lassen, mittels "pop_selectcomps"
+help pop_selectcomps
+pop_selectcomps(EEG,[1:30])
 
 % Zeitverlauf der ICA komponenten wird je nach softwareversion gelöscht,
 % wir können sie wiederherstellen:
 EEG.icaact = (EEG.icaweights*EEG.icasphere) * EEG.data;
 
+
 %Zeitverlauf visualisieren  (Komponenten 1,2 und 3, jeweils die ersten 5000 Datenpunkte)
 
 figure;
 %subplots sollen 3 zeilen und 1 spalte haben
-subplot(4,1,1)
+subplot(4,1,1) % x  TODO durch korrekte zahlen ersetzen
 plot(EEG.icaact(1,1:5000))
-subplot(4,1,2)
+%TODO: In den weiteren zwei zeilen, jeweils aktivierung der 2. und der 3.
+%komponente plotten.
+subplot(4,1,2) % x  TODO durch korrekte zahlen ersetzen
 plot(EEG.icaact(2,1:5000))
-subplot(4,1,3)
+subplot(4,1,3) % x  TODO durch korrekte zahlen ersetzen
 plot(EEG.icaact(3,1:5000))
-subplot(4,1,4)
+subplot(4,1,4) % x  TODO durch korrekte zahlen ersetzen
 plot(EEG.icaact(4,1:5000))
 
 %Von hand die Koponenten rausnehmen die wir von Auge identifiziert haben:
 badComps_manual=[1,3,4];
 
 %TODO: funktion "pop_subcomp" korrekt verwenden
-EEG_ica_V1 =pop_subcomp(EEG,badComps_manual);
+help pop_subcomp
+EEG_ica_V1=pop_subcomp(EEG,badComps_manual);
 
 %Signal vor und nach dem entfernen der Komponenten betrachten
 FrontalElec=2;
@@ -230,7 +251,7 @@ legend('Before ICA', 'After ICA')
 
 %gesamtes IClabel paket zum pfad hinzufügen, sodass wir alle Funktionen
 %verwenden können:
-addpath(genpath(['eeglab2021.1' filesep 'plugins/ICLabel']))
+addpath(genpath(['eeglab2025.1' filesep 'plugins/ICLabel']))
 
 %IClabel klassifizieren lassen:
 EEG_ICL = iclabel(EEG); 
@@ -265,3 +286,19 @@ minDatalengthICA=20*EEG.nbchan^2;
 length(EEG.data)
 
 %% Freiwillige Hausaufgabe: 
+
+
+%Im Code oberhalb haben wir diese Code-Zeile benutzt um zu sehen, welche
+% der Komponenten (Zeilen in markBad) als eine von 5 Artefakt Kategorien
+% (Spalten in markBad) 
+badComps_ICL=find(any(markBad,2));
+
+%schauen wir uns nochmals die Dimensionen an:
+size(markBad)
+
+%und einen Blick auf die gesamte Matrix
+markBad
+
+%Was hat die any() Funktion für uns gemacht?
+%Was hat die find() Funktion für uns gemacht?
+% Probiere es nacheinander aus und beschreibe was du siehst.
