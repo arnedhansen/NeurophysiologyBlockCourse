@@ -125,6 +125,20 @@ for q = 1:4
 end
 fprintf('Available: %s\n', strjoin(quizLabels(availableQuizzes), ', '));
 
+%% Compute Swiss grades (0.25 precision): min points = 4.0, max points = 6.0
+for q = availableQuizzes
+    totalPoints = sum(quizData(q).scores, 2, 'omitnan');
+    minPts = min(totalPoints);
+    maxPts = max(totalPoints);
+    if maxPts > minPts
+        rawGrade = 4 + (totalPoints - minPts) / (maxPts - minPts) * 2;
+    else
+        rawGrade = repmat(5.0, size(totalPoints));
+    end
+    quizData(q).grades = round(rawGrade * 4) / 4;  % 0.25 precision
+    quizData(q).totalPoints = totalPoints;
+end
+
 %% Collect unique subjects across quizzes (matched by username)
 allUsernames  = {};
 allFirstNames = {};
@@ -141,11 +155,37 @@ end
 nAllSubjects = length(allUsernames);
 fprintf('Subjects: %d\n\n', nAllSubjects);
 
+%% Precompute average quiz grade per subject (0.5 precision, worst grade dropped)
+avgGrades = NaN(nAllSubjects, 1);
+for s = 1:nAllSubjects
+    grades = [];
+    for q = availableQuizzes
+        sIdx = find(strcmp(quizData(q).usernames, allUsernames{s}), 1);
+        if ~isempty(sIdx)
+            grades(end+1) = quizData(q).grades(sIdx); %#ok<AGROW>
+        end
+    end
+    if length(grades) >= 2
+        gradesSorted = sort(grades);
+        avgGrades(s) = mean(gradesSorted(2:end));  % drop worst
+    elseif length(grades) == 1
+        avgGrades(s) = grades(1);
+    end
+    if ~isnan(avgGrades(s))
+        avgGrades(s) = round(avgGrades(s) * 2) / 2;  % 0.5 precision
+    end
+end
+
 %% --- Individual Subject Figures ---
 for s = 1:nAllSubjects
     fig = figure('Position', [0 0 1512 982], 'Visible', 'off');
-    sgtitle(sprintf('%s %s', allFirstNames{s}, allLastNames{s}), ...
-        'FontSize', 16, 'FontWeight', 'bold');
+    if ~isnan(avgGrades(s))
+        sgtitle(sprintf('%s %s (Ø Quiz: %.1f)', allFirstNames{s}, allLastNames{s}, avgGrades(s)), ...
+            'FontSize', 16, 'FontWeight', 'bold');
+    else
+        sgtitle(sprintf('%s %s', allFirstNames{s}, allLastNames{s}), ...
+            'FontSize', 16, 'FontWeight', 'bold');
+    end
 
     for q = availableQuizzes
         ax = subplot(2, 2, q);
@@ -180,14 +220,19 @@ for s = 1:nAllSubjects
         ylim([0 115]);
         ylabel('Score (%)');
         
-        % Title with total score and percentage
+        % Title with total score, percentage, and Swiss grade
         totalRaw = sum(rawV, 'omitnan');
         totalMax = sum(quizData(q).maxScores);
         totalPct = round((totalRaw / totalMax) * 100);
-        if totalRaw == round(totalRaw)
-            title(sprintf('%s (%d/%d, %d%%)', quizLabels{q}, totalRaw, totalMax, totalPct), 'FontSize', 12);
+        if ~isempty(sIdx)
+            gradeStr = sprintf(', %.2f', quizData(q).grades(sIdx));
         else
-            title(sprintf('%s (%.1f/%d, %d%%)', quizLabels{q}, totalRaw, totalMax, totalPct), 'FontSize', 12);
+            gradeStr = '';
+        end
+        if totalRaw == round(totalRaw)
+            title(sprintf('%s (%d/%d, %d%%%s)', quizLabels{q}, totalRaw, totalMax, totalPct, gradeStr), 'FontSize', 12);
+        else
+            title(sprintf('%s (%.1f/%d, %d%%%s)', quizLabels{q}, totalRaw, totalMax, totalPct, gradeStr), 'FontSize', 12);
         end
         
         xticks(1:nItems);
@@ -195,7 +240,7 @@ for s = 1:nAllSubjects
         xtickangle(45);
         ax.Position(2) = ax.Position(2) + 0.05;
         ax.Position(4) = ax.Position(4) - 0.05;
-        set(ax, 'FontSize', 10, 'Box', 'off');
+        set(ax, 'FontSize', 8, 'Box', 'off');
         hold off;
     end
 
@@ -245,5 +290,59 @@ end
 exportgraphics(fig, fullfile(figPath, 'Quiz_GrandAverage.png'), 'Resolution', 300);
 close(fig);
 fprintf('Saved: Quiz_GrandAverage.png\n');
+
+%% --- Quiz Grade Distributions ---
+fig = figure('Position', [0 0 1512 982], 'Visible', 'off');
+fig.Color = [0.98 0.98 0.98];
+gradeVals = 4:0.25:6;        % bar centers (0.25 steps)
+gradeClr   = [0.22 0.42 0.62];
+gradeClrEnd = [0.18 0.48 0.52];
+
+% Subplot
+spIdx = [1 2 4 5];  % positions for Quiz I, II, III, IV
+for i = 1:4
+    ax = subplot(2, 3, spIdx(i));
+    if ismember(i, availableQuizzes)
+        g = quizData(i).grades;
+        counts = arrayfun(@(v) sum(g == v), gradeVals);
+        bar(gradeVals, counts, 0.85, 'FaceColor', gradeClr, 'EdgeColor', 'none', 'FaceAlpha', 0.92);
+        xlim([3.75 6.25]);
+        xticks(gradeVals);
+        xticklabels(arrayfun(@(v) sprintf('%.2g', v), gradeVals, 'UniformOutput', false));
+        xlabel('Swiss grade');
+        ylabel('Count');
+        meanQuiz = mean(g);
+        title(sprintf('%s (Ø %.1f)', quizLabels{i}, meanQuiz), 'FontSize', 12, 'FontWeight', 'normal');
+    else
+        axis off;
+        title(quizLabels{i}, 'FontSize', 12, 'FontWeight', 'normal');
+    end
+    set(ax, 'FontSize', 10, 'Box', 'off', 'XTickLabelRotation', 45, 'TickLength', [0.02 0.02]);
+end
+
+% End grade: centered in 3rd column, spans full height
+ax = subplot(2, 3, [3 6]);
+endGrades = avgGrades(~isnan(avgGrades));
+if ~isempty(endGrades)
+    counts = arrayfun(@(v) sum(endGrades == v), gradeVals);
+    bar(gradeVals, counts, 0.85, 'FaceColor', gradeClrEnd, 'EdgeColor', 'none', 'FaceAlpha', 0.92);
+    xlim([3.75 6.25]);
+    xticks(gradeVals);
+    xticklabels(arrayfun(@(v) sprintf('%.2g', v), gradeVals, 'UniformOutput', false));
+    xlabel('Swiss grade');
+    ylabel('Count');
+else
+    axis off;
+end
+if ~isempty(endGrades)
+    title(sprintf('End grade (Ø %.1f)', mean(endGrades)), 'FontSize', 12, 'FontWeight', 'normal');
+else
+    title('End grade', 'FontSize', 12, 'FontWeight', 'normal');
+end
+set(ax, 'FontSize', 10, 'Box', 'off', 'XTickLabelRotation', 45, 'TickLength', [0.02 0.02]);
+
+exportgraphics(fig, fullfile(figPath, 'Quiz_Grades.png'), 'Resolution', 300);
+close(fig);
+fprintf('Saved: Quiz_Grades.png\n');
 
 fprintf('\nDone.\n');
